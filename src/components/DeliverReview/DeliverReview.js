@@ -1,0 +1,175 @@
+import React, { useEffect, useReducer } from "react";
+import { useParams, Link } from "react-router-dom";
+import Grid from "@material-ui/core/Grid";
+import Paper from "@material-ui/core/Paper";
+import TextField from "@material-ui/core/TextField";
+import InputLabel from "@material-ui/core/InputLabel";
+import TextareaAutosize from "@material-ui/core/TextareaAutosize";
+import Title from "../Title";
+import Typography from "@material-ui/core/Typography";
+import Breadcrumbs from "@material-ui/core/Breadcrumbs";
+import useStyles from "../../Hooks/useStyles/useStyles";
+import actions from "./deliver-review-actions";
+import reducer from "./deliver-review-reducer";
+import initialize from "./deliver-review-initialize";
+import convertISOToYMD from "../../utils/dateUtils";
+
+export default function DeliverReview() {
+  let { deliverAssignmentId } = useParams();
+  const [state, dispatch] = useReducer(reducer, initialize);
+  const classes = useStyles();
+
+  useEffect(() => {
+    fetch(
+      `http://localhost:5000/api/deliver-assignments/${deliverAssignmentId}`,
+      {
+        method: "GET",
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        if (data) {
+          const results = data[0];
+          dispatch({
+            type: actions.setDeliver,
+            payload: {
+              student: `${results.student.username}(${results.student.student_id})`,
+              assignment: `${results.exercise.title}`,
+              arriveAt: convertISOToYMD(results.arrive_at),
+              totalWordsDetected: results.total_words_detected,
+              dueDate: convertISOToYMD(results.assignment.due_date),
+              exerciseId: results.exercise.exercise_id,
+            },
+          });
+        }
+      })
+      .catch((error) => console.log(error));
+  }, []);
+
+  useEffect(() => {
+    if (!state.exerciseId) {
+      return;
+    }
+    fetch(`http://localhost:5000/api/exercises/${state.exerciseId}`, {
+      method: "GET",
+      mode: "cors",
+      cache: "no-cache",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        if (data) {
+          const results = data[0];
+          dispatch({
+            type: actions.setExerciseDetails,
+            payload: {
+              description: results.description,
+              totalWordsInTheLecture: results.words_amount,
+            },
+          });
+        }
+      })
+      .catch((error) => console.log(error));
+  }, [state.exerciseId]);
+
+  return (
+    <Grid container spacing={3}>
+      <Breadcrumbs aria-label="breadcrumb">
+        <Link to={"/"}>Inicio</Link>
+        <Link to={"/alumnos"}>Alumnos</Link>
+        <Typography color="textPrimary">Resumen Tarea Recibida</Typography>
+      </Breadcrumbs>
+
+      <Grid item xs={12}>
+        <Paper className={classes.paper}>
+          <Title>Tarea Recibida</Title>
+          <div className={classes.review}>
+            <div>
+              <InputLabel id="demo-mutiple-checkbox-label">Alumno</InputLabel>
+              <TextField
+                value={state.student}
+                readOnly
+                className={classes.textFullWidth}
+              />
+            </div>
+            <div>
+              <InputLabel id="demo-mutiple-checkbox-label">Tarea</InputLabel>
+              <TextField
+                value={state.assignment}
+                readOnly
+                className={classes.textFullWidth}
+              />
+            </div>
+            <div>
+              <InputLabel id="demo-mutiple-checkbox-label">
+                Fecha de entrega
+              </InputLabel>
+              <TextField
+                value={state.arriveAt}
+                readOnly
+                className={classes.textFullWidth}
+              />
+            </div>
+            <div>
+              <InputLabel id="demo-mutiple-checkbox-label">
+                Fecha limite de entrega
+              </InputLabel>
+              <TextField
+                value={state.dueDate}
+                readOnly
+                className={classes.textFullWidth}
+              />
+            </div>
+            <div>
+              <InputLabel id="demo-mutiple-checkbox-label">
+                Cantidad de palabras en el texto
+              </InputLabel>
+              <TextField
+                value={state.totalWordsInTheLecture}
+                readOnly
+                className={classes.textFullWidth}
+              />
+            </div>
+            <div>
+              <InputLabel id="demo-mutiple-checkbox-label">
+                Cantidad de palabras detectadas
+              </InputLabel>
+              <TextField
+                value={state.totalWordsDetected}
+                className={classes.textFullWidth}
+              />
+            </div>
+          </div>
+          <Title>Description</Title>
+
+          <TextareaAutosize
+            minRows={5}
+            aria-label="empty textarea"
+            placeholder="Descripcion"
+            readOnly
+            value={state.description}
+          />
+          <div style={{ marginTop: "1rem" }}>
+            <Title>Audio</Title>
+            <audio src="./static/music/foo.mp3" controls autoPlay />
+          </div>
+        </Paper>
+      </Grid>
+    </Grid>
+  );
+}
