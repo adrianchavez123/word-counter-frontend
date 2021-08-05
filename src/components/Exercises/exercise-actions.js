@@ -5,4 +5,5 @@ export default {
   setDescription: "SET_DESCRIPTION",
   setWordsAmount: "SET_WORDS_AMOUNT",
   setExercises: "SET_EXERCISES",
+  setAction: "SET_ACTION",
 };

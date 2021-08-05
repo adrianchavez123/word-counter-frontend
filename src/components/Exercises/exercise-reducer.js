@@ -35,6 +35,12 @@ export default function reducer(state, action) {
         exercises: [...action.payload.exercises],
       };
 
+    case actions.setAction:
+      return {
+        ...state,
+        action: action.payload.action,
+      };
+
     default:
       return state;
   }

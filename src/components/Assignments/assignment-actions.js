@@ -1,5 +1,5 @@
 export default {
-  openAssignmentModal: "OPEN_EXERCISE_MODAL",
+  openAssignmentModal: "OPEN_ASSIGNMENT_MODAL",
   setAssignment: "SET_ASSIGNMENT",
   setGroup: "SET_GROUP",
   setDueDate: "SET_DUE_DATE",
@@ -8,4 +8,7 @@ export default {
   setGroups: "SET_GROUPS",
   openGroupModal: "OPEN_GROUP_MODAL",
   setExercises: "SET_EXERCISES",
+  setGroupSelected: "SET_GROUP_SELECTED",
+  openExerciseModal: "OPEN_EXERCISE_MODAL",
+  setExerciseSelected: "SET_EXERCISE_SELECTED",
 };
