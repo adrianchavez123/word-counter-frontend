@@ -11,4 +11,5 @@ export default {
   setGroupSelected: "SET_GROUP_SELECTED",
   openExerciseModal: "OPEN_EXERCISE_MODAL",
   setExerciseSelected: "SET_EXERCISE_SELECTED",
+  setAction: "SET_ACTION",
 };

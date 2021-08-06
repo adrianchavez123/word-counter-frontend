@@ -1,6 +1,7 @@
 export default {
   openAssignment: false,
   assignment: {
+    assignment_id: null,
     group: { id: "", text: "" },
     dueDate: "",
     exercise: { id: "", text: "" },
@@ -12,4 +13,5 @@ export default {
   groupSelected: { group_id: null, name: "", students: [] },
   openExercise: false,
   exerciseSelected: { exercise_id: null, title: "", description: "" },
+  action: "CREATE",
 };

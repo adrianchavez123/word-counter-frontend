@@ -4,14 +4,6 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Title from "../Title";
 import useStyles from "../../Hooks/useStyles/useStyles";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
-import SaveIcon from "@material-ui/icons/Save";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import FormGroup from "@material-ui/core/FormGroup";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
 import ModalForm from "../ModalForm/ModalForm";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
@@ -23,20 +15,45 @@ import actions from "./assignment-actions";
 import initialState from "./assignment-initialize";
 import reducer from "./assignment-reducer";
 import convertISOToYMD from "../../utils/dateUtils";
+import AssignmentForm from "./AssignmentForm/AssignmentForm";
 
 export default function Assignments() {
   const classes = useStyles();
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const handleModify = (id) => {
-    // const record = assignment.filter((row) => row[0] === id);
-    // console.log(record);
-    // if (record) {
-    //   const [, ...exercise] = record;
-    //   setTitle(exercise[0]);
-    //   setDescription(exercise[1]);
-    //   setWordsAmount(exercise[2]);
-    // }
+    dispatch({
+      type: actions.setAction,
+      payload: { action: "MODIFY" },
+    });
+
+    const assignment = state.assignments.find(
+      (assignment) => assignment.assignment_id === id
+    );
+    if (assignment) {
+      const updateAssignment = {
+        ...assignment,
+        group: {
+          id: assignment.group.group_id,
+          text: assignment.group.group_name,
+        },
+        exercise: {
+          id: assignment.exercise.exercise_id,
+          text: assignment.exercise.title,
+        },
+        dueDate: convertISOToYMD(assignment.due_date),
+      };
+      dispatch({
+        type: actions.setAssignment,
+        payload: {
+          assignment: { ...updateAssignment },
+        },
+      });
+    }
+    dispatch({
+      type: actions.openAssignmentModal,
+      payload: { openAssignment: true },
+    });
   };
 
   const handleExerciseDetails = (id, exercises) => {
@@ -68,69 +85,100 @@ export default function Assignments() {
       });
     }
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = (e, action) => {
     e.preventDefault();
     const assignment = {
       due_date: state.assignment.dueDate,
       exercise_id: state.assignment.exercise.id,
       group_id: state.assignment.group.id,
     };
-    fetch("http://localhost:5000/api/assignments", {
-      method: "POST",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(assignment),
-    })
+    let fetched = null;
+    if (action === "CREATE") {
+      fetched = fetch("http://localhost:5000/api/assignments", {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(assignment),
+      });
+    } else if (action === "MODIFY") {
+      fetched = fetch(
+        `http://localhost:5000/api/assignments/${state.assignment.assignment_id}`,
+        {
+          method: "PUT",
+          mode: "cors",
+          cache: "no-cache",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(assignment),
+        }
+      );
+    } else {
+      return;
+    }
+    fetched
       .then((response) => {
         if (response.ok) {
           return response.json();
         }
       })
       .then((data) => {
-        // arreglar aqui
+        const newAssignment = {
+          ...state.assignment,
+          assignment_id:
+            action === "CREATE"
+              ? data.assignment.assignment_id
+              : state.assignment.assignment_i,
+          group: {
+            group_id: state.assignment.group.id,
+            group_name: state.assignment.group.text,
+          },
+          exercise: {
+            exercise_id: state.assignment.exercise.id,
+            title: state.assignment.exercise.text,
+          },
+          due_date: new Date(assignment.due_date).toISOString(),
+        };
+
+        if (action === "CREATE") {
+          dispatch({
+            type: actions.setAssignments,
+            payload: {
+              assignments: [...state.assignments, newAssignment],
+            },
+          });
+        }
+
+        if (action === "MODIFY") {
+          const assignments = state.assignments.filter(
+            (assignment) =>
+              assignment.assignment_id !== state.assignment.assignment_id
+          );
+          dispatch({
+            type: actions.setAssignments,
+            payload: {
+              assignments: [...assignments, newAssignment],
+            },
+          });
+        }
+
         dispatch({
           type: actions.setAssignment,
           payload: {
             assignment: {
-              group: { id: null, text: "" },
+              assignment_id: null,
+              group: { id: "", text: "" },
               dueDate: "",
-              exercise: { id: null, text: "" },
+              exercise: { id: "", text: "" },
             },
           },
         });
         dispatch({
           type: actions.openAssignmentModal,
           payload: { openAssignment: false },
-        });
-        dispatch({
-          type: actions.setAssignments,
-          payload: {
-            assignments: [
-              ...state.assignments,
-              [
-                data.assignment.assignment_id,
-                {
-                  id: assignment.exercise_id,
-                  text: data.assignment.exercise_name,
-                  onClick: (e) =>
-                    handleExerciseDetails(
-                      assignment.exercise_id,
-                      state.exercises
-                    ),
-                },
-                {
-                  id: assignment.group_id,
-                  text: data.assignment.group_name,
-                  onClick: (e) =>
-                    handleGroupDetails(assignment.group_id, state.groups),
-                },
-                assignment.due_date,
-              ],
-            ],
-          },
         });
       })
       .catch((error) => console.log(error));
@@ -151,13 +199,14 @@ export default function Assignments() {
         }
       })
       .then((data) => {
+        console.log(data);
+        console.log(state.assignments);
         if (data.message === "Assignment deleted!") {
-          // setExercises(exercises.filter((exercise) => exercise[0] !== id));
           dispatch({
             type: actions.setAssignments,
             payload: {
               assignments: state.assignments.filter(
-                (assignment) => assignment[0] !== id
+                (assignment) => assignment.assignment_id !== id
               ),
             },
           });
@@ -225,35 +274,38 @@ export default function Assignments() {
         }
       );
       const asignmentsData = await assignmentsResponse.json();
-      const assignments = asignmentsData.map((assignment) => {
-        return [
-          assignment.assignment_id,
-          {
-            id: assignment.exercise.exercise_id,
-            text: assignment.exercise.title,
-            onClick: (e) =>
-              handleExerciseDetails(
-                assignment.exercise.exercise_id,
-                exerciseData
-              ),
-          },
-          {
-            id: assignment.group.group_id,
-            text: assignment.group.group_name,
-            onClick: (e) => {
-              handleGroupDetails(assignment.group.group_id, groupsData.groups);
-            },
-          },
-          convertISOToYMD(assignment.due_date),
-        ];
-      });
       await dispatch({
         type: actions.setAssignments,
-        payload: { assignments: [...assignments] },
+        payload: { assignments: [...asignmentsData] },
       });
     };
     loadData();
   }, []);
+
+  const flatAssignments = () => {
+    return state.assignments.map((assignment) => {
+      return [
+        assignment.assignment_id,
+        {
+          id: assignment.exercise.exercise_id,
+          text: assignment.exercise.title,
+          onClick: (e) =>
+            handleExerciseDetails(
+              assignment.exercise.exercise_id,
+              state.exercises
+            ),
+        },
+        {
+          id: assignment.group.group_id,
+          text: assignment.group.group_name,
+          onClick: (e) => {
+            handleGroupDetails(assignment.group.group_id, state.groups);
+          },
+        },
+        convertISOToYMD(assignment.due_date),
+      ];
+    });
+  };
 
   return (
     <Grid container spacing={3}>
@@ -319,119 +371,25 @@ export default function Assignments() {
             buttonTitle="Crear"
             title="Crear Tarea"
             open={state.openAssignment}
-            setOpen={(openAssignment) =>
+            setOpen={(openAssignment) => {
               dispatch({
                 type: actions.openAssignmentModal,
                 payload: { openAssignment: openAssignment },
-              })
-            }
+              });
+              dispatch({
+                type: actions.setAction,
+                payload: { action: "CREATE" },
+              });
+            }}
           >
-            <FormGroup className={classes.formGroup}>
-              <InputLabel id="demo-simple-select-label">Ejercicio</InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={state.assignment.exercise.id}
-                onChange={(e) => {
-                  const exercise = state.exercises.find(
-                    (exercise) => exercise.exercise_id === e.target.value
-                  );
-                  console.log(exercise);
-                  dispatch({
-                    type: actions.setExercise,
-                    payload: {
-                      exercise: { id: e.target.value, text: exercise.name },
-                    },
-                  });
-                }}
-              >
-                {state.exercises.map((exercise) => (
-                  <MenuItem
-                    value={exercise.exercise_id}
-                    key={`exercise-${exercise.exercise_id}`}
-                  >
-                    {exercise.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormGroup>
-            <FormGroup className={classes.formGroup}>
-              <InputLabel id="demo-simple-select-label">Grupo</InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={state.assignment.group.id}
-                onChange={(e) => {
-                  const group = state.groups.find(
-                    (group) => group.group_id === e.target.value
-                  );
-                  dispatch({
-                    type: actions.setGroup,
-                    payload: {
-                      group: {
-                        id: e.target.value,
-                        text: group.name,
-                      },
-                    },
-                  });
-                }}
-              >
-                {state.groups.map((group) => (
-                  <MenuItem
-                    value={group.group_id}
-                    key={`group-${group.group_id}`}
-                  >
-                    {group.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormGroup>
-            <FormGroup className={classes.formGroup}>
-              <TextField
-                id="standard-number"
-                label="Fecha de Entrega"
-                type="date"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                value={state.dueDate}
-                onChange={(e) =>
-                  dispatch({
-                    type: actions.setDueDate,
-                    payload: { dueDate: e.target.value },
-                  })
-                }
-              />
-            </FormGroup>
-            <div style={{ marginTop: "1rem" }}>
-              <Button
-                variant="contained"
-                size="large"
-                className={classes.button}
-                startIcon={<HighlightOffIcon />}
-                type="button"
-                onClick={(e) =>
-                  dispatch({
-                    type: actions.openAssignmentModal,
-                    payload: { openAssignment: false },
-                  })
-                }
-                style={{ marginRight: "1rem" }}
-              >
-                Cancelar
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                className={classes.button}
-                startIcon={<SaveIcon />}
-                type="submit"
-                onClick={handleSubmit}
-              >
-                Guardar
-              </Button>
-            </div>
+            <AssignmentForm
+              assignment={state.assignment}
+              exercises={state.exercises}
+              groups={state.groups}
+              handleSubmit={handleSubmit}
+              dispatch={dispatch}
+              action={state.action}
+            />
           </ModalForm>
         </Paper>
       </Grid>
@@ -440,7 +398,7 @@ export default function Assignments() {
           <Table
             title="Tareas"
             headers={headers}
-            rows={state.assignments}
+            rows={flatAssignments()}
             resource="assignments"
             handleModify={handleModify}
             handleDelete={handleDelete}

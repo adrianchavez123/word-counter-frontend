@@ -74,6 +74,12 @@ export default function reducer(state, action) {
         },
       };
 
+    case actions.setAction:
+      return {
+        ...state,
+        action: action.payload.action,
+      };
+
     default:
       return state;
   }

@@ -36,8 +36,6 @@ export default function Ejercicios() {
   };
 
   const handleModify = (id) => {
-    console.log(id);
-    console.log(state.exercises);
     dispatch({
       type: actions.setAction,
       payload: { action: "MODIFY" },
