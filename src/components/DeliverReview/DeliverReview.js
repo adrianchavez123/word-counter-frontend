@@ -48,6 +48,7 @@ export default function DeliverReview() {
               totalWordsDetected: results.total_words_detected,
               dueDate: convertISOToYMD(results.assignment.due_date),
               exerciseId: results.exercise.exercise_id,
+              audioURL: results.audio_URL,
             },
           });
         }
@@ -166,7 +167,7 @@ export default function DeliverReview() {
           />
           <div style={{ marginTop: "1rem" }}>
             <Title>Audio</Title>
-            <audio src="./static/music/foo.mp3" controls autoPlay />
+            <audio src={state.audioURL} controls />
           </div>
         </Paper>
       </Grid>

@@ -7,4 +7,5 @@ export default {
   dueDate: "",
   exerciseId: "",
   description: "",
+  audioURL: null,
 };
