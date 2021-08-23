@@ -20,7 +20,7 @@ import { mainListItems, secondaryListItems } from "../Nav";
 import Home from "../Home";
 import Students from "../Students";
 import Exercises from "../Exercises";
-import Assignments from "../Assignments";
+import { Assignments } from "../Assignments";
 import DeliverReview from "../DeliverReview";
 import Footer from "../Footer";
 import useStyles from "../../Hooks/useStyles/useStyles";

@@ -4,9 +4,9 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import Button from "@material-ui/core/Button";
-import useStyles from "../../Hooks/useStyles/useStyles";
+import useStyles from "../../../Hooks/useStyles/useStyles";
 
-export default function GroupList({ group, onClose }) {
+export default function GroupList({ group, onClose, showCloseButton = true }) {
   const classes = useStyles();
   return (
     <>
@@ -16,23 +16,24 @@ export default function GroupList({ group, onClose }) {
         {group.students.map((student) => (
           <ListItem key={`student-${student.student_id}`}>
             <ListItemText
-              primary={`Item ${student.username}(${student.student_id})`}
+              primary={`${student.username}(${student.student_id})`}
             />
           </ListItem>
         ))}
       </List>
-
-      <Button
-        variant="contained"
-        size="large"
-        className={classes.button}
-        startIcon={<HighlightOffIcon />}
-        type="button"
-        onClick={onClose}
-        style={{ marginRight: "1rem" }}
-      >
-        Cerrar
-      </Button>
+      {showCloseButton && (
+        <Button
+          variant="contained"
+          size="large"
+          className={classes.button}
+          startIcon={<HighlightOffIcon />}
+          type="button"
+          onClick={onClose}
+          style={{ marginRight: "1rem" }}
+        >
+          Cerrar
+        </Button>
+      )}
     </>
   );
 }
