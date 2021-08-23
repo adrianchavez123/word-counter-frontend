@@ -81,6 +81,7 @@ export default function DeliverReview() {
             payload: {
               description: results.description,
               totalWordsInTheLecture: results.words_amount,
+              imageURL: results.exercise_image,
             },
           });
         }
@@ -169,6 +170,18 @@ export default function DeliverReview() {
             <Title>Audio</Title>
             <audio src={state.audioURL} controls />
           </div>
+          {state.imageURL && (
+            <div style={{ marginTop: "1rem" }}>
+              <Title>Imagen</Title>
+              <div>
+                <img
+                  src={state.imageURL}
+                  alt={state.imageURL}
+                  style={{ maxWidth: "800px" }}
+                />
+              </div>
+            </div>
+          )}
         </Paper>
       </Grid>
     </Grid>

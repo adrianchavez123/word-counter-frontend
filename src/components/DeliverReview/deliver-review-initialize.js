@@ -8,4 +8,5 @@ export default {
   exerciseId: "",
   description: "",
   audioURL: null,
+  imageURL: null,
 };
