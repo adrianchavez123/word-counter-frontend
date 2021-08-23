@@ -9,6 +9,7 @@ import {
   groupInitialize,
   handleSubmitGroup,
   handleAddStudent,
+  handleRemoveStudent,
 } from "../Groups";
 import {
   AssignmentForm,
@@ -16,6 +17,7 @@ import {
   assignmentReducer,
   assignmentInitialize,
   handleAssignmentSubmit,
+  f,
 } from "../Assignments";
 
 export default function Card() {
@@ -173,6 +175,7 @@ export default function Card() {
           }}
           handleSubmit={(e) => handleSubmitGroup(e, state, dispatch)}
           handleAddStudent={(e) => handleAddStudent(e, state, dispatch)}
+          handleRemoveStudent={handleRemoveStudent}
           dispatch={dispatch}
           editable={true}
           action={"CREATE"}

@@ -147,3 +147,15 @@ export function handleAddStudent(e, state, dispatch) {
 
   return;
 }
+
+export function handleRemoveStudent(student_id, state, dispatch) {
+  console.log("handleRemoveStudent");
+  console.log(student_id);
+
+  console.log(state);
+  console.log(dispatch);
+  dispatch({
+    type: groupActions.removeStudent,
+    payload: { student: student_id },
+  });
+}

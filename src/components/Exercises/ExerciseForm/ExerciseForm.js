@@ -23,6 +23,24 @@ export default function ExerciseForm({
 
   const handleImageSelect = (e) => {
     setImageSrc(URL.createObjectURL(e.target.files[0]));
+    dispatch({
+      type: actions.setExerciseImage,
+      payload: { exercise_image: e.target.files[0].name },
+    });
+
+    const files = e.target.files;
+    const formData = new FormData();
+    formData.append("image", files[0]);
+
+    fetch("http://localhost:5000/image", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {})
+      .catch((error) => {
+        console.error(error);
+      });
   };
   return (
     <>

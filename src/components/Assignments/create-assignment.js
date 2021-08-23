@@ -1,5 +1,5 @@
 import { assignmentActions as actions } from ".";
-//
+
 export function handleAssignmentSubmit(e, state, dispatch) {
   e.preventDefault();
   const assignment = {

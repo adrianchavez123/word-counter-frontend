@@ -6,4 +6,6 @@ export default {
   setWordsAmount: "SET_WORDS_AMOUNT",
   setExercises: "SET_EXERCISES",
   setAction: "SET_ACTION",
+  setExerciseImage: "SET_EXERCISE_IMAGE",
+  setImageSrc: "SET_IMAGE_SRC",
 };

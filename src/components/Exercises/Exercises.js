@@ -68,7 +68,9 @@ export default function Ejercicios() {
       description: state.exercise.description,
       words_amount: state.exercise.wordsAmount,
       professor_id: 1,
+      exercise_image: state.exercise.exercise_image,
     };
+
     if (action === "CREATE") {
       fetched = fetch("http://localhost:5000/api/exercises", {
         method: "POST",
@@ -141,6 +143,7 @@ export default function Ejercicios() {
               description: "",
               wordsAmount: 0,
               exercise_id: null,
+              exercise_image: "",
             },
           },
         });

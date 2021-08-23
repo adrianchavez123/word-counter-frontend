@@ -39,13 +39,9 @@ export default function reducer(state, action) {
 
     case actions.removeStudent:
       // remove student
-      return {
-        ...state,
-        group: {
-          ...state.group,
-          students: [...state.group.students, action.payload.student],
-        },
-      };
+      console.log("aqui");
+      console.log(state);
+      return state;
 
     case actions.setAction:
       return {

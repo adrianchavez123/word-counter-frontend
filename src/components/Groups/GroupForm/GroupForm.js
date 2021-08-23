@@ -15,6 +15,7 @@ export default function GroupForm({
   handleCancel,
   handleSubmit,
   handleAddStudent,
+  handleRemoveStudent,
   dispatch,
   editable = true,
   action = "CREATE",
@@ -42,6 +43,8 @@ export default function GroupForm({
         <GroupList
           group={{ students: group.students }}
           showCloseButton={false}
+          removeMembers={true}
+          handleRemoveStudent={handleRemoveStudent}
         />
       </FormGroup>
       <FormGroup className={classes.formGroup}>
