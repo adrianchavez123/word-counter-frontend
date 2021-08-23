@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import TextareaAutosize from "@material-ui/core/TextareaAutosize";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -8,6 +8,7 @@ import FormGroup from "@material-ui/core/FormGroup";
 import InputLabel from "@material-ui/core/InputLabel";
 import useStyles from "../../../Hooks/useStyles/useStyles";
 import actions from "../exercise-actions";
+import ImageUpload from "image-upload-react";
 
 export default function ExerciseForm({
   exercise,
@@ -18,6 +19,11 @@ export default function ExerciseForm({
   action = "CREATE",
 }) {
   const classes = useStyles();
+  const [imageSrc, setImageSrc] = useState();
+
+  const handleImageSelect = (e) => {
+    setImageSrc(URL.createObjectURL(e.target.files[0]));
+  };
   return (
     <>
       <FormGroup className={classes.formGroup}>
@@ -71,6 +77,19 @@ export default function ExerciseForm({
             })
           }
           disabled={!editable}
+        />
+      </FormGroup>
+      <FormGroup className={classes.formGroup} style={{ marginBottom: "5rem" }}>
+        <InputLabel htmlFor="Imagen">Imagen</InputLabel>
+        <ImageUpload
+          handleImageSelect={handleImageSelect}
+          imageSrc={imageSrc}
+          setImageSrc={setImageSrc}
+          style={{
+            width: 400,
+            height: 250,
+            background: "#f4f4f4",
+          }}
         />
       </FormGroup>
       <div style={{ marginTop: "1rem" }}>
