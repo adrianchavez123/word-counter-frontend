@@ -97,6 +97,16 @@ const useStyles = makeStyles((theme) => ({
     display: "grid",
     gridTemplateColumns: "80% 20%",
   },
+  addStudent: {
+    width: "100%",
+    display: "grid",
+    gridTemplateColumns: "40% 40% 20%",
+  },
+  addStudentField: {
+    display: "flex",
+    flexDirection: "column",
+    margin: "0 0.3rem",
+  },
 }));
 
 export default useStyles;

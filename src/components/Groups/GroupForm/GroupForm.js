@@ -2,6 +2,7 @@ import React from "react";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import SaveIcon from "@material-ui/icons/Save";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import FormGroup from "@material-ui/core/FormGroup";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -48,44 +49,49 @@ export default function GroupForm({
         />
       </FormGroup>
       <FormGroup className={classes.formGroup}>
-        <InputLabel htmlFor="nombre">Estudiante</InputLabel>
-        <TextField
-          id="estudiante"
-          placeholder="Nombre"
-          value={student.name}
-          onChange={(e) =>
-            dispatch({
-              type: actions.setStudentName,
-              payload: { studentName: e.target.value },
-            })
-          }
-          disabled={!editable}
-        />
-        <InputLabel htmlFor="nombre">Identificador</InputLabel>
-        <TextField
-          id="identificador"
-          placeholder="Número de identificador"
-          value={student.id}
-          onChange={(e) =>
-            dispatch({
-              type: actions.setStudentId,
-              payload: { studentId: e.target.value },
-            })
-          }
-          disabled={!editable}
-        />
-
-        <Button
-          variant="contained"
-          size="large"
-          className={classes.button}
-          startIcon={<HighlightOffIcon />}
-          type="button"
-          onClick={handleAddStudent}
-          style={{ marginRight: "1rem" }}
-        >
-          Agregar
-        </Button>
+        <div className={classes.addStudent}>
+          <div className={classes.addStudentField}>
+            <InputLabel htmlFor="nombre">Estudiante</InputLabel>
+            <TextField
+              id="estudiante"
+              placeholder="Nombre"
+              value={student.name}
+              onChange={(e) =>
+                dispatch({
+                  type: actions.setStudentName,
+                  payload: { studentName: e.target.value },
+                })
+              }
+              disabled={!editable}
+            />
+          </div>
+          <div className={classes.addStudentField}>
+            <InputLabel htmlFor="nombre">Identificador</InputLabel>
+            <TextField
+              id="identificador"
+              placeholder="Número de identificador"
+              value={student.id}
+              onChange={(e) =>
+                dispatch({
+                  type: actions.setStudentId,
+                  payload: { studentId: e.target.value },
+                })
+              }
+              disabled={!editable}
+            />
+          </div>
+          <Button
+            variant="contained"
+            size="large"
+            className={classes.button}
+            startIcon={<AddCircleIcon />}
+            type="button"
+            onClick={handleAddStudent}
+            style={{ marginRight: "1rem" }}
+          >
+            Agregar
+          </Button>
+        </div>
       </FormGroup>
 
       <div style={{ marginTop: "1rem" }}>
