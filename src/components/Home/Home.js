@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useReducer } from "react";
 import clsx from "clsx";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
@@ -8,6 +8,10 @@ import Chart from "../Chart";
 import Deposits from "../Card/";
 import Table from "../../Table";
 import useStyles from "../../Hooks/useStyles/useStyles";
+import actions from "./home-actions";
+import reducer from "./home-reducer";
+import initialize from "./home-initialize";
+import convertISOToYMD from "../../utils/dateUtils";
 
 const headers = [
   "Tarea",
@@ -17,11 +21,11 @@ const headers = [
 export default function Home() {
   const classes = useStyles();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-
+  const [state, dispatch] = useReducer(reducer, initialize);
   useEffect(() => {
     const professor_id = 1;
     fetch(
-      `http://localhost:5000/api/deliver-assignments?professor_id=${professor_id}`,
+      `http://localhost:5000/api/deliver-assignments/last-delivers?professor_id=${professor_id}`,
       {
         method: "GET",
         mode: "cors",
@@ -38,18 +42,24 @@ export default function Home() {
       })
       .then((data) => {
         if (data) {
-          console.log(data);
-          // dispatch({
-          //   type: actions.setDeliver,
-          //   payload: {
-          //     student: `${results.student.username}(${results.student.student_id})`,
-          //     assignment: `${results.exercise.title}`,
-          //     arriveAt: convertISOToYMD(results.arrive_at),
-          //     totalWordsDetected: results.total_words_detected,
-          //     dueDate: convertISOToYMD(results.assignment.due_date),
-          //     exerciseId: results.exercise.exercise_id,
-          //   },
-          // });
+          const delivers = data.map((data) => [
+            data.assignment_id,
+            data.title,
+            convertISOToYMD(data.due_date),
+            data.total_delivers,
+          ]);
+          dispatch({
+            type: actions.getLastDelivers,
+            payload: {
+              lastDelivers: delivers.filter((deliver, i) => i < 10),
+            },
+          });
+          dispatch({
+            type: actions.getDelivers,
+            payload: {
+              delivers: delivers,
+            },
+          });
         }
       })
       .catch((error) => console.log(error));
@@ -78,21 +88,7 @@ export default function Home() {
             title="Ultimas Tareas"
             headers={headers}
             showActions={false}
-            rows={[
-              [1, "Leer lectura el cuento más contado", "2021-08-03", 5],
-              [
-                2,
-                "Leer lectura de la página 189 del libro de lecturas",
-                "2021-08-10",
-                3,
-              ],
-              [
-                2,
-                "Leer lectura de la página 20 del libro de lecturas",
-                "2021-08-15",
-                0,
-              ],
-            ]}
+            rows={state.lastDelivers}
           />
         </Paper>
       </Grid>
