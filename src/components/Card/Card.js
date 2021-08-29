@@ -17,7 +17,6 @@ import {
   assignmentReducer,
   assignmentInitialize,
   handleAssignmentSubmit,
-  f,
 } from "../Assignments";
 
 export default function Card() {

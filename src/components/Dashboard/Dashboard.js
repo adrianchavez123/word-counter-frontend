@@ -17,7 +17,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import { mainListItems, secondaryListItems } from "../Nav";
-import Home from "../Home";
+import { Home } from "../Home";
 import Students from "../Students";
 import Exercises from "../Exercises";
 import { Assignments } from "../Assignments";

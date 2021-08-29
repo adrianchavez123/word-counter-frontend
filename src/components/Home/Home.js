@@ -5,12 +5,10 @@ import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Chart from "../Chart";
-import Deposits from "../Card/";
+import Card from "../Card/";
 import Table from "../../Table";
 import useStyles from "../../Hooks/useStyles/useStyles";
-import actions from "./home-actions";
-import reducer from "./home-reducer";
-import initialize from "./home-initialize";
+import { homeActions, homeInitialize, homeReducer } from ".";
 import convertISOToYMD from "../../utils/dateUtils";
 
 const headers = [
@@ -21,7 +19,7 @@ const headers = [
 export default function Home() {
   const classes = useStyles();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-  const [state, dispatch] = useReducer(reducer, initialize);
+  const [state, dispatch] = useReducer(homeReducer, homeInitialize);
   useEffect(() => {
     const professor_id = 1;
     fetch(
@@ -49,15 +47,52 @@ export default function Home() {
             data.total_delivers,
           ]);
           dispatch({
-            type: actions.getLastDelivers,
+            type: homeActions.getLastDelivers,
             payload: {
               lastDelivers: delivers.filter((deliver, i) => i < 10),
             },
           });
           dispatch({
-            type: actions.getDelivers,
+            type: homeActions.getDelivers,
             payload: {
               delivers: delivers,
+            },
+          });
+        }
+      })
+      .catch((error) => console.log(error));
+  }, []);
+
+  useEffect(() => {
+    const professor_id = 1;
+    fetch(
+      `http://localhost:5000/api/deliver-assignments/average-delivers?professor_id=${professor_id}`,
+      {
+        method: "GET",
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        if (data) {
+          const averageDeliverResults = data.map((data) => ({
+            name: data.title,
+            cantidad_palabras_detectadas: data.avg_words_amount,
+            cantidad_palabras_en_lectura: data.words_amount,
+          }));
+
+          dispatch({
+            type: homeActions.getAverageDeliverResults,
+            payload: {
+              averageDeliverResults: averageDeliverResults,
             },
           });
         }
@@ -73,12 +108,12 @@ export default function Home() {
       </Grid>
       <Grid item xs={12} md={8} lg={9}>
         <Paper className={fixedHeightPaper}>
-          <Chart />
+          <Chart rows={state.averageDeliverResults} />
         </Paper>
       </Grid>
       <Grid item xs={12} md={4} lg={3}>
         <Paper className={fixedHeightPaper}>
-          <Deposits />
+          <Card />
         </Paper>
       </Grid>
 

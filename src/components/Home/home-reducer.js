@@ -13,6 +13,11 @@ export default function reducer(state, action) {
         delivers: [...action.payload.delivers],
       };
 
+    case actions.getAverageDeliverResults:
+      return {
+        ...state,
+        averageDeliverResults: [...action.payload.averageDeliverResults],
+      };
     default:
       return state;
   }
