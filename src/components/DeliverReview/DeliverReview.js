@@ -49,6 +49,7 @@ export default function DeliverReview() {
               dueDate: convertISOToYMD(results.assignment.due_date),
               exerciseId: results.exercise.exercise_id,
               audioURL: results.audio_URL,
+              speechToText: results.speech_to_text,
             },
           });
         }
@@ -170,6 +171,14 @@ export default function DeliverReview() {
             <Title>Audio</Title>
             <audio src={state.audioURL} controls />
           </div>
+          <Title>Texto detectado</Title>
+          <TextareaAutosize
+            minRows={5}
+            aria-label="texto detectado"
+            placeholder="Texto"
+            readOnly
+            value={state.speechToText}
+          />
           {state.imageURL && (
             <div style={{ marginTop: "1rem" }}>
               <Title>Imagen</Title>

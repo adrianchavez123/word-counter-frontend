@@ -46,12 +46,7 @@ export default function Home() {
             convertISOToYMD(data.due_date),
             data.total_delivers,
           ]);
-          dispatch({
-            type: homeActions.getLastDelivers,
-            payload: {
-              lastDelivers: delivers.filter((deliver, i) => i < 10),
-            },
-          });
+
           dispatch({
             type: homeActions.getDelivers,
             payload: {
@@ -123,7 +118,7 @@ export default function Home() {
             title="Ultimas Tareas"
             headers={headers}
             showActions={false}
-            rows={state.lastDelivers}
+            rows={state.delivers}
           />
         </Paper>
       </Grid>

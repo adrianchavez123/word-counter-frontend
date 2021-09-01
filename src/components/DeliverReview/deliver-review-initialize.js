@@ -9,4 +9,5 @@ export default {
   description: "",
   audioURL: null,
   imageURL: null,
+  speechToText: "",
 };
