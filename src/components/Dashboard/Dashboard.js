@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Switch, Route } from "react-router-dom";
 import clsx from "clsx";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -24,15 +24,59 @@ import { Assignments } from "../Assignments";
 import DeliverReview from "../DeliverReview";
 import Footer from "../Footer";
 import useStyles from "../../Hooks/useStyles/useStyles";
+import { Link, useHistory } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Dashboard() {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
+  const [error, setError] = useState("");
+  const { currentUser, logout } = useAuth();
+  const displayName = currentUser.displayName;
+  const email = currentUser.email;
+  const photoURL = currentUser.photoURL;
+  const emailVerified = currentUser.emailVerified;
+  const uid = currentUser.uid;
+  console.log(displayName);
+  console.log(email);
+  console.log(photoURL);
+  console.log(uid);
+  console.log(emailVerified);
+
+  const history = useHistory();
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
   const handleDrawerClose = () => {
     setOpen(false);
+  };
+
+  async function handleLogout() {
+    setError("");
+    try {
+      await logout();
+    } catch {
+      setError("failed to log out");
+      history.push("/login");
+    }
+  }
+
+  const dash = () => {
+    return (
+      <>
+        <div className="body">
+          <h2>profile</h2>
+          {error && <span>{error}</span>}
+          <strong>Email: </strong>
+          {currentUser.email}
+          <Link to="/update-profile">Update profile</Link>
+        </div>
+        <div>
+          <button onClick={handleLogout}>Log out</button>
+        </div>
+      </>
+    );
   };
 
   return (

@@ -1,12 +1,12 @@
 import { groupActions } from ".";
 
-export function handleSubmitGroup(e, state, dispatch) {
+export function handleSubmitGroup(e, state, dispatch, professor_id) {
   e.preventDefault();
   let fetched = null;
   const group = {
     name: state.group.name,
     students: state.group.students.map((student) => student.student_id),
-    professor_id: 1,
+    professor_id: professor_id,
   };
   if (state.action === "CREATE") {
     fetched = fetch("http://localhost:5000/api/groups", {

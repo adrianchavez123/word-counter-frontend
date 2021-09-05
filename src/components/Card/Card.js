@@ -18,6 +18,7 @@ import {
   assignmentInitialize,
   handleAssignmentSubmit,
 } from "../Assignments";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Card() {
   const [state, dispatch] = useReducer(groupReducer, groupInitialize);
@@ -25,12 +26,14 @@ export default function Card() {
     assignmentReducer,
     assignmentInitialize
   );
+  const { currentUser } = useAuth();
+  const professor_id = currentUser.uid;
 
   useEffect(() => {
     const loadData = async () => {
-      const professorId = 1;
+      const professor_id = currentUser.uid;
       const groupsResponse = await fetch(
-        `http://localhost:5000/api/groups?professor_id=${professorId}`,
+        `http://localhost:5000/api/groups?professor_id=${professor_id}`,
         {
           method: "GET",
           mode: "cors",
@@ -51,7 +54,7 @@ export default function Card() {
       }
 
       const exercisesResponse = await fetch(
-        `http://localhost:5000/api/exercises?professor_id=${professorId}`,
+        `http://localhost:5000/api/exercises?professor_id=${professor_id}`,
         {
           method: "GET",
           mode: "cors",
@@ -75,7 +78,7 @@ export default function Card() {
       });
 
       const assignmentsResponse = await fetch(
-        `http://localhost:5000/api/assignments?professor_id=${professorId}`,
+        `http://localhost:5000/api/assignments?professor_id=${professor_id}`,
         {
           method: "GET",
           mode: "cors",
@@ -172,7 +175,9 @@ export default function Card() {
               },
             });
           }}
-          handleSubmit={(e) => handleSubmitGroup(e, state, dispatch)}
+          handleSubmit={(e) =>
+            handleSubmitGroup(e, state, dispatch, professor_id)
+          }
           handleAddStudent={(e) => handleAddStudent(e, state, dispatch)}
           handleRemoveStudent={handleRemoveStudent}
           dispatch={dispatch}

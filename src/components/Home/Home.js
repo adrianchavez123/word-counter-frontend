@@ -10,7 +10,7 @@ import Table from "../../Table";
 import useStyles from "../../Hooks/useStyles/useStyles";
 import { homeActions, homeInitialize, homeReducer } from ".";
 import convertISOToYMD from "../../utils/dateUtils";
-
+import { useAuth } from "../../contexts/AuthContext";
 const headers = [
   "Tarea",
   "Fecha de Entrega Máxima",
@@ -20,8 +20,10 @@ export default function Home() {
   const classes = useStyles();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   const [state, dispatch] = useReducer(homeReducer, homeInitialize);
+  const { currentUser } = useAuth();
+
   useEffect(() => {
-    const professor_id = 1;
+    const professor_id = currentUser.uid;
     fetch(
       `http://localhost:5000/api/deliver-assignments/last-delivers?professor_id=${professor_id}`,
       {
@@ -59,7 +61,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const professor_id = 1;
+    const professor_id = currentUser.uid;
     fetch(
       `http://localhost:5000/api/deliver-assignments/average-delivers?professor_id=${professor_id}`,
       {

@@ -107,6 +107,31 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     margin: "0 0.3rem",
   },
+  authRoot: {
+    minWidth: 600,
+    padding: "2rem 0.5rem",
+  },
+  failureText: {
+    fontSize: "0.8rem",
+    color: "#f44336",
+  },
+  sucessText: {
+    fontSize: "0.8rem",
+    color: "rgb(30, 70, 32)",
+  },
+  loadingContainer: {
+    display: "grid",
+    justifyContent: "center",
+    alignContent: "center",
+  },
+  authContainer: {
+    background: "#f4f4f4",
+    display: "grid",
+    justifyContent: "center",
+    alignContent: "center",
+    width: "100vw",
+    height: "100vh",
+  },
 }));
 
 export default useStyles;

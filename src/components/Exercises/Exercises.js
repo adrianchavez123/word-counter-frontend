@@ -14,10 +14,12 @@ import actions from "./exercise-actions";
 import initialState from "./exercise-initialize";
 import reducer from "./exercise-reducer";
 import ExerciseForm from "./ExerciseForm";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Ejercicios() {
   const classes = useStyles();
   const [state, dispatch] = useReducer(reducer, initialState);
+  const { currentUser } = useAuth();
 
   const handleDelete = (id) => {
     const promise = deleteResource({ id: id, resourceType: "exercises" });
@@ -67,7 +69,7 @@ export default function Ejercicios() {
       title: state.exercise.title,
       description: state.exercise.description,
       words_amount: state.exercise.wordsAmount,
-      professor_id: 1,
+      professor_id: currentUser.uid,
       exercise_image: state.exercise.exercise_image,
     };
 
@@ -162,8 +164,8 @@ export default function Ejercicios() {
     });
   };
   useEffect(() => {
-    const professorId = 1;
-    fetch(`http://localhost:5000/api/exercises?professor_id=${professorId}`, {
+    const professor_id = currentUser.uid;
+    fetch(`http://localhost:5000/api/exercises?professor_id=${professor_id}`, {
       method: "GET",
       mode: "cors",
       cache: "no-cache",

@@ -16,10 +16,12 @@ import initialState from "./assignment-initialize";
 import reducer from "./assignment-reducer";
 import convertISOToYMD from "../../utils/dateUtils";
 import { AssignmentForm, handleAssignmentSubmit } from ".";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Assignments() {
   const classes = useStyles();
   const [state, dispatch] = useReducer(reducer, initialState);
+  const { currentUser } = useAuth();
 
   const handleModify = (id) => {
     dispatch({
@@ -216,9 +218,9 @@ export default function Assignments() {
 
   useEffect(() => {
     const loadData = async () => {
-      const professorId = 1;
+      const professor_id = currentUser.uid;
       const groupsResponse = await fetch(
-        `http://localhost:5000/api/groups?professor_id=${professorId}`,
+        `http://localhost:5000/api/groups?professor_id=${professor_id}`,
         {
           method: "GET",
           mode: "cors",
@@ -239,7 +241,7 @@ export default function Assignments() {
       }
 
       const exercisesResponse = await fetch(
-        `http://localhost:5000/api/exercises?professor_id=${professorId}`,
+        `http://localhost:5000/api/exercises?professor_id=${professor_id}`,
         {
           method: "GET",
           mode: "cors",
@@ -263,7 +265,7 @@ export default function Assignments() {
       });
 
       const assignmentsResponse = await fetch(
-        `http://localhost:5000/api/assignments?professor_id=${professorId}`,
+        `http://localhost:5000/api/assignments?professor_id=${professor_id}`,
         {
           method: "GET",
           mode: "cors",
