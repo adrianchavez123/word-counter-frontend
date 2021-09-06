@@ -187,7 +187,7 @@ export default function Ejercicios() {
         });
       })
       .catch((error) => console.log(error));
-  }, []);
+  }, [currentUser.uid]);
   return (
     <Grid container spacing={3}>
       <Breadcrumbs aria-label="breadcrumb">

@@ -148,7 +148,7 @@ export default function Alumnos() {
         }
       })
       .catch((error) => console.log(error));
-  }, []);
+  }, [currentUser.uid]);
   return (
     <Grid container spacing={3}>
       <Breadcrumbs aria-label="breadcrumb">

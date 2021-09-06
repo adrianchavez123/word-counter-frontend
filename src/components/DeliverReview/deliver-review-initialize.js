@@ -1,4 +1,4 @@
-export default {
+const initialState = {
   student: "",
   assignment: "",
   arriveAt: "",
@@ -11,3 +11,5 @@ export default {
   imageURL: null,
   speechToText: "",
 };
+
+export default initialState;

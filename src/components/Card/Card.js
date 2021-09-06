@@ -95,7 +95,7 @@ export default function Card() {
       });
     };
     loadData();
-  }, []);
+  }, [currentUser.uid]);
 
   return (
     <React.Fragment>

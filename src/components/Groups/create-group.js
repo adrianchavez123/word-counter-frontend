@@ -90,17 +90,14 @@ export function handleAddStudent(e, state, dispatch) {
     student_id: state.student.id,
   };
 
-  const fetchStudent = fetch(
-    `http://localhost:5000/api/students/${student.student_id}`,
-    {
-      method: "GET",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  )
+  fetch(`http://localhost:5000/api/students/${student.student_id}`, {
+    method: "GET",
+    mode: "cors",
+    cache: "no-cache",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
     .then((response) => {
       if (response.status === 200) {
         return "PUT";
@@ -144,8 +141,6 @@ export function handleAddStudent(e, state, dispatch) {
     .catch((err) => {
       console.log(err);
     });
-
-  return;
 }
 
 export function handleRemoveStudent(student_id, state, dispatch) {

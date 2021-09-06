@@ -282,7 +282,7 @@ export default function Assignments() {
       });
     };
     loadData();
-  }, []);
+  }, [currentUser.uid]);
 
   const flatAssignments = () => {
     return state.assignments.map((assignment) => {

@@ -1,4 +1,4 @@
-export default {
+const initialState = {
   openGroup: false,
   group: {
     name: "",
@@ -11,3 +11,5 @@ export default {
   action: "CREATE",
   groups: [],
 };
+
+export default initialState;

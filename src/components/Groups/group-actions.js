@@ -1,4 +1,4 @@
-export default {
+const actions = {
   openGroupModal: "OPEN_GROUP_MODAL",
   setGroup: "SET_GROUP",
   setName: "SET_NAME",
@@ -8,3 +8,5 @@ export default {
   addStudent: "ADD_STUDENT",
   removeStudent: "REMOVE_STUDENT",
 };
+
+export default actions;

@@ -1,4 +1,4 @@
-export default {
+const initialState = {
   openAssignment: false,
   assignment: {
     assignment_id: null,
@@ -15,3 +15,5 @@ export default {
   exerciseSelected: { exercise_id: null, title: "", description: "" },
   action: "CREATE",
 };
+
+export default initialState;

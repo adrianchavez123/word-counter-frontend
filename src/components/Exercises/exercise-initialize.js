@@ -1,4 +1,4 @@
-export default {
+const initialState = {
   openExercise: false,
   exercise: {
     title: "",
@@ -11,3 +11,5 @@ export default {
   action: "CREATE",
   imageSrc: "",
 };
+
+export default initialState;

@@ -1,4 +1,4 @@
-export default {
+const actions = {
   openExerciseModal: "OPEN_EXERCISE_MODAL",
   setExercise: "SET_EXERCISE",
   setTitle: "SET_TITLE",
@@ -9,3 +9,5 @@ export default {
   setExerciseImage: "SET_EXERCISE_IMAGE",
   setImageSrc: "SET_IMAGE_SRC",
 };
+
+export default actions;

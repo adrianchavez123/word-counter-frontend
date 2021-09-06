@@ -55,7 +55,7 @@ export default function DeliverReview() {
         }
       })
       .catch((error) => console.log(error));
-  }, []);
+  }, [deliverAssignmentId]);
 
   useEffect(() => {
     if (!state.exerciseId) {

@@ -1,4 +1,4 @@
-export default {
+const actions = {
   openAssignmentModal: "OPEN_ASSIGNMENT_MODAL",
   setAssignment: "SET_ASSIGNMENT",
   setGroup: "SET_GROUP",
@@ -13,3 +13,5 @@ export default {
   setExerciseSelected: "SET_EXERCISE_SELECTED",
   setAction: "SET_ACTION",
 };
+
+export default actions;
