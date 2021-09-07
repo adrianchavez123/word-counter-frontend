@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Switch, Route } from "react-router-dom";
 import clsx from "clsx";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -37,11 +37,6 @@ export default function Dashboard() {
   const photoURL = currentUser.photoURL;
   const emailVerified = currentUser.emailVerified;
   const uid = currentUser.uid;
-  console.log(displayName);
-  console.log(email);
-  console.log(photoURL);
-  console.log(uid);
-  console.log(emailVerified);
 
   const history = useHistory();
 
@@ -61,6 +56,36 @@ export default function Dashboard() {
       history.push("/login");
     }
   }
+
+  useEffect(() => {
+    const fetchProfessor = async () => {
+      const professor_id = currentUser.uid;
+      const response = await fetch(
+        `http://localhost:5000/api/professors/${professor_id}`
+      );
+
+      const json = await response.json();
+      if (json?.message === "Professor not found!") {
+        const professor = {
+          professor_id: currentUser.uid,
+          username: currentUser.displayName,
+          name: currentUser.displayName,
+          email: currentUser.email,
+        };
+        const respose = await fetch("http://localhost:5000/api/professors", {
+          method: "POST",
+          mode: "cors",
+          cache: "no-cache",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(professor),
+        });
+        await respose.json();
+      }
+    };
+    fetchProfessor();
+  }, [currentUser.uid, currentUser.displayName, currentUser.email]);
 
   const dash = () => {
     return (
