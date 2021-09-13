@@ -74,18 +74,21 @@ export default function Ejercicios() {
     };
 
     if (action === "CREATE") {
-      fetched = fetch("http://localhost:5000/api/exercises", {
-        method: "POST",
-        mode: "cors",
-        cache: "no-cache",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(exercise),
-      });
+      fetched = fetch(
+        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/exercise`,
+        {
+          method: "POST",
+          mode: "cors",
+          cache: "no-cache",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(exercise),
+        }
+      );
     } else if (action === "MODIFY") {
       fetched = fetch(
-        `http://localhost:5000/api/exercises/${state.exercise.exercise_id}`,
+        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/exercises/${state.exercise.exercise_id}`,
         {
           method: "PUT",
           mode: "cors",
@@ -165,14 +168,17 @@ export default function Ejercicios() {
   };
   useEffect(() => {
     const professor_id = currentUser.uid;
-    fetch(`http://localhost:5000/api/exercises?professor_id=${professor_id}`, {
-      method: "GET",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    fetch(
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/exercises?professor_id=${professor_id}`,
+      {
+        method: "GET",
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
       .then((response) => {
         if (response.ok) {
           return response.json();

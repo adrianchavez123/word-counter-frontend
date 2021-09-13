@@ -21,7 +21,7 @@ export default function DeliverReview() {
 
   useEffect(() => {
     fetch(
-      `http://localhost:5000/api/deliver-assignments/${deliverAssignmentId}`,
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/deliver-assignments/${deliverAssignmentId}`,
       {
         method: "GET",
         mode: "cors",
@@ -61,14 +61,17 @@ export default function DeliverReview() {
     if (!state.exerciseId) {
       return;
     }
-    fetch(`http://localhost:5000/api/exercises/${state.exerciseId}`, {
-      method: "GET",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    fetch(
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/exercises/${state.exerciseId}`,
+      {
+        method: "GET",
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
       .then((response) => {
         if (response.ok) {
           return response.json();

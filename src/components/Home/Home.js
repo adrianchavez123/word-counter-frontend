@@ -25,7 +25,7 @@ export default function Home() {
   useEffect(() => {
     const professor_id = currentUser.uid;
     fetch(
-      `http://localhost:5000/api/deliver-assignments/last-delivers?professor_id=${professor_id}`,
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/deliver-assignments/last-delivers?professor_id=${professor_id}`,
       {
         method: "GET",
         mode: "cors",
@@ -63,7 +63,7 @@ export default function Home() {
   useEffect(() => {
     const professor_id = currentUser.uid;
     fetch(
-      `http://localhost:5000/api/deliver-assignments/average-delivers?professor_id=${professor_id}`,
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/deliver-assignments/average-delivers?professor_id=${professor_id}`,
       {
         method: "GET",
         mode: "cors",

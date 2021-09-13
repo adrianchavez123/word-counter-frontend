@@ -9,7 +9,7 @@ export function handleSubmitGroup(e, state, dispatch, professor_id) {
     professor_id: professor_id,
   };
   if (state.action === "CREATE") {
-    fetched = fetch("http://localhost:5000/api/groups", {
+    fetched = fetch(`${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/groups`, {
       method: "POST",
       mode: "cors",
       cache: "no-cache",
@@ -20,7 +20,7 @@ export function handleSubmitGroup(e, state, dispatch, professor_id) {
     });
   } else if (state.action === "MODIFY") {
     fetched = fetch(
-      `http://localhost:5000/api/groups/${state.group.group_id}`,
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/groups/${state.group.group_id}`,
       {
         method: "PUT",
         mode: "cors",
@@ -90,14 +90,17 @@ export function handleAddStudent(e, state, dispatch) {
     student_id: state.student.id,
   };
 
-  fetch(`http://localhost:5000/api/students/${student.student_id}`, {
-    method: "GET",
-    mode: "cors",
-    cache: "no-cache",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
+  fetch(
+    `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/students/${student.student_id}`,
+    {
+      method: "GET",
+      mode: "cors",
+      cache: "no-cache",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
     .then((response) => {
       if (response.status === 200) {
         return "PUT";
@@ -108,7 +111,7 @@ export function handleAddStudent(e, state, dispatch) {
     })
     .then((fetchAction) => {
       fetched = fetch(
-        "http://localhost:5000/api/students" +
+        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/students` +
           (fetchAction === "PUT" ? `/${student.student_id}` : ""),
         {
           method: fetchAction,

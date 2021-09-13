@@ -9,18 +9,21 @@ export function handleAssignmentSubmit(e, state, dispatch) {
   };
   let fetched = null;
   if (state.action === "CREATE") {
-    fetched = fetch("http://localhost:5000/api/assignments", {
-      method: "POST",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(assignment),
-    });
+    fetched = fetch(
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/assignments`,
+      {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(assignment),
+      }
+    );
   } else if (state.action === "MODIFY") {
     fetched = fetch(
-      `http://localhost:5000/api/assignments/${state.assignment.assignment_id}`,
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/assignments/${state.assignment.assignment_id}`,
       {
         method: "PUT",
         mode: "cors",

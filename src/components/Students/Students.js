@@ -68,7 +68,7 @@ export default function Alumnos() {
       Number(student.substring(student.indexOf("(") + 1, student.length - 1))
     );
     fetch(
-      `http://localhost:5000/api/deliver-assignments?professor_id=${professor_id}`,
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/deliver-assignments?professor_id=${professor_id}`,
       {
         method: "GET",
         mode: "cors",
@@ -124,14 +124,17 @@ export default function Alumnos() {
 
   useEffect(() => {
     const professor_id = currentUser.uid;
-    fetch(`http://localhost:5000/api/students?professor_id=${professor_id}`, {
-      method: "GET",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    fetch(
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/students?professor_id=${professor_id}`,
+      {
+        method: "GET",
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
       .then((response) => {
         if (response.ok) {
           return response.json();

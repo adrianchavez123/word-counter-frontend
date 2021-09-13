@@ -33,7 +33,7 @@ export default function Card() {
     const loadData = async () => {
       const professor_id = currentUser.uid;
       const groupsResponse = await fetch(
-        `http://localhost:5000/api/groups?professor_id=${professor_id}`,
+        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/groups?professor_id=${professor_id}`,
         {
           method: "GET",
           mode: "cors",
@@ -54,7 +54,7 @@ export default function Card() {
       }
 
       const exercisesResponse = await fetch(
-        `http://localhost:5000/api/exercises?professor_id=${professor_id}`,
+        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/exercises?professor_id=${professor_id}`,
         {
           method: "GET",
           mode: "cors",
@@ -78,7 +78,7 @@ export default function Card() {
       });
 
       const assignmentsResponse = await fetch(
-        `http://localhost:5000/api/assignments?professor_id=${professor_id}`,
+        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/assignments?professor_id=${professor_id}`,
         {
           method: "GET",
           mode: "cors",

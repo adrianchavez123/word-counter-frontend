@@ -61,7 +61,7 @@ export default function Dashboard() {
     const fetchProfessor = async () => {
       const professor_id = currentUser.uid;
       const response = await fetch(
-        `http://localhost:5000/api/professors/${professor_id}`
+        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/professors/${professor_id}`
       );
 
       const json = await response.json();
@@ -72,15 +72,18 @@ export default function Dashboard() {
           name: currentUser.displayName,
           email: currentUser.email,
         };
-        const respose = await fetch("http://localhost:5000/api/professors", {
-          method: "POST",
-          mode: "cors",
-          cache: "no-cache",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(professor),
-        });
+        const respose = await fetch(
+          `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/professors`,
+          {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(professor),
+          }
+        );
         await respose.json();
       }
     };

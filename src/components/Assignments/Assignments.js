@@ -96,7 +96,7 @@ export default function Assignments() {
   //   };
   //   let fetched = null;
   //   if (action === "CREATE") {
-  //     fetched = fetch("http://localhost:5000/api/assignments", {
+  //     fetched = fetch(`${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/assignments`, {
   //       method: "POST",
   //       mode: "cors",
   //       cache: "no-cache",
@@ -107,7 +107,7 @@ export default function Assignments() {
   //     });
   //   } else if (action === "MODIFY") {
   //     fetched = fetch(
-  //       `http://localhost:5000/api/assignments/${state.assignment.assignment_id}`,
+  //       `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/assignments/${state.assignment.assignment_id}`,
   //       {
   //         method: "PUT",
   //         mode: "cors",
@@ -187,14 +187,17 @@ export default function Assignments() {
   // };
 
   const handleDelete = (id) => {
-    fetch(`http://localhost:5000/api/assignments/${id}`, {
-      method: "DELETE",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    fetch(
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/assignments/${id}`,
+      {
+        method: "DELETE",
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
       .then((response) => {
         if (response.ok) {
           return response.json();
@@ -220,7 +223,7 @@ export default function Assignments() {
     const loadData = async () => {
       const professor_id = currentUser.uid;
       const groupsResponse = await fetch(
-        `http://localhost:5000/api/groups?professor_id=${professor_id}`,
+        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/groups?professor_id=${professor_id}`,
         {
           method: "GET",
           mode: "cors",
@@ -241,7 +244,7 @@ export default function Assignments() {
       }
 
       const exercisesResponse = await fetch(
-        `http://localhost:5000/api/exercises?professor_id=${professor_id}`,
+        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/exercises?professor_id=${professor_id}`,
         {
           method: "GET",
           mode: "cors",
@@ -265,7 +268,7 @@ export default function Assignments() {
       });
 
       const assignmentsResponse = await fetch(
-        `http://localhost:5000/api/assignments?professor_id=${professor_id}`,
+        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/assignments?professor_id=${professor_id}`,
         {
           method: "GET",
           mode: "cors",

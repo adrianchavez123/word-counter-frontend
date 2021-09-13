@@ -32,7 +32,7 @@ export default function ExerciseForm({
     const formData = new FormData();
     formData.append("image", files[0]);
 
-    fetch("http://localhost:5000/image", {
+    fetch(`${process.env.REACT_APP_BACKEND_SERVICE_URL}/image`, {
       method: "POST",
       body: formData,
     })
