@@ -75,7 +75,7 @@ export default function Ejercicios() {
 
     if (action === "CREATE") {
       fetched = fetch(
-        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/exercise`,
+        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/exercises`,
         {
           method: "POST",
           mode: "cors",

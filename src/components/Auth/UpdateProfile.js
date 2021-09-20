@@ -122,7 +122,7 @@ export default function UpdateProfile() {
           </form>
         </CardContent>
         <CardActions>
-          <Link to="/login">Cancelar</Link>
+          <Link to="/">Cancelar</Link>
         </CardActions>
       </Card>
     </div>

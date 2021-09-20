@@ -10,12 +10,10 @@ import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
-import Badge from "@material-ui/core/Badge";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import NotificationsIcon from "@material-ui/icons/Notifications";
 import { mainListItems, secondaryListItems } from "../Nav";
 import { Home } from "../Home";
 import Students from "../Students";
@@ -24,21 +22,14 @@ import { Assignments } from "../Assignments";
 import DeliverReview from "../DeliverReview";
 import Footer from "../Footer";
 import useStyles from "../../Hooks/useStyles/useStyles";
-import { Link, useHistory } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import ProfileDropDown from "../ProfileDropDown";
 
 export default function Dashboard() {
   const classes = useStyles();
   const [open, setOpen] = useState(true);
-  const [error, setError] = useState("");
-  const { currentUser, logout } = useAuth();
-  const displayName = currentUser.displayName;
-  const email = currentUser.email;
-  const photoURL = currentUser.photoURL;
-  const emailVerified = currentUser.emailVerified;
+  const { currentUser } = useAuth();
   const uid = currentUser.uid;
-
-  const history = useHistory();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -46,16 +37,6 @@ export default function Dashboard() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
-  async function handleLogout() {
-    setError("");
-    try {
-      await logout();
-    } catch {
-      setError("failed to log out");
-      history.push("/login");
-    }
-  }
 
   useEffect(() => {
     const fetchProfessor = async () => {
@@ -90,23 +71,6 @@ export default function Dashboard() {
     fetchProfessor();
   }, [currentUser.uid, currentUser.displayName, currentUser.email]);
 
-  const dash = () => {
-    return (
-      <>
-        <div className="body">
-          <h2>profile</h2>
-          {error && <span>{error}</span>}
-          <strong>Email: </strong>
-          {currentUser.email}
-          <Link to="/update-profile">Update profile</Link>
-        </div>
-        <div>
-          <button onClick={handleLogout}>Log out</button>
-        </div>
-      </>
-    );
-  };
-
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -136,11 +100,7 @@ export default function Dashboard() {
           >
             Calificaciones de los estudiantes
           </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
+          <ProfileDropDown />
         </Toolbar>
       </AppBar>
       <Drawer
