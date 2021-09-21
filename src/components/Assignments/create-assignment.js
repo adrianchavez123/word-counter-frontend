@@ -58,7 +58,7 @@ export function handleAssignmentSubmit(e, state, dispatch) {
           exercise_id: state.assignment.exercise.id,
           title: state.assignment.exercise.text,
         },
-        due_date: new Date(assignment.due_date).toISOString(),
+        due_date: new Date(`${assignment.due_date}T00:00:00`).toISOString(),
       };
 
       if (state.action === "CREATE") {
