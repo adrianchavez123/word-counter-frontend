@@ -110,7 +110,10 @@ export default function Card() {
         payload: { assignments: [...asignmentsData] },
       });
     };
-    loadData();
+
+    setTimeout(() => {
+      loadData();
+    }, 2000);
   }, [currentUser.uid]);
 
   return (

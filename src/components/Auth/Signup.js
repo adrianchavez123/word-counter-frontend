@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import Card from "@material-ui/core/Card";
@@ -10,6 +10,7 @@ import TextField from "@material-ui/core/TextField";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Title from "../Title";
 import useStyles from "../../Hooks/useStyles/useStyles";
+import tokenGenerator from "../../utils/tokenGenerator";
 
 export default function Signup() {
   const emailRef = useRef();
@@ -41,7 +42,29 @@ export default function Signup() {
           body: JSON.stringify(professor),
         }
       );
-      return await respose.json();
+      const professorResponse = await respose.json();
+      const token = tokenGenerator();
+      const group = {
+        professor_id: professorResponse.professor.professor_id,
+        name: "mi grupo",
+        token: token,
+      };
+      const groupRequest = await fetch(
+        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/groups`,
+        {
+          method: "POST",
+          mode: "cors",
+          cache: "no-cache",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(group),
+        }
+      );
+      const groupResponse = await groupRequest.json();
+      if (groupResponse) {
+        return { message: "Professor created successfully" };
+      }
     }
   };
   const handleSubmit = async (e) => {
@@ -65,6 +88,12 @@ export default function Signup() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (currentUser) {
+      history.push("/");
+    }
+  }, [currentUser]);
   return (
     <div className={classes.authContainer}>
       <Card className={classes.authRoot} variant="outlined">

@@ -24,6 +24,7 @@ import Footer from "../Footer";
 import useStyles from "../../Hooks/useStyles/useStyles";
 import { useAuth } from "../../contexts/AuthContext";
 import ProfileDropDown from "../ProfileDropDown";
+import tokenGenerator from "../../utils/tokenGenerator";
 
 export default function Dashboard() {
   const classes = useStyles();
@@ -65,7 +66,29 @@ export default function Dashboard() {
             body: JSON.stringify(professor),
           }
         );
-        await respose.json();
+        const professorResponse = await respose.json();
+        const token = tokenGenerator();
+        const group = {
+          professor_id: professorResponse.professor.professor_id,
+          name: "mi grupo",
+          token: token,
+        };
+        const groupRequest = await fetch(
+          `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/groups`,
+          {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(group),
+          }
+        );
+        const groupResponse = await groupRequest.json();
+        if (groupResponse) {
+          return { message: "Professor created successfully" };
+        }
       }
     };
     fetchProfessor();

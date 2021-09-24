@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import Card from "@material-ui/core/Card";
@@ -14,7 +14,7 @@ import useStyles from "../../Hooks/useStyles/useStyles";
 export default function Login() {
   const emailRef = useRef();
   const passwordRef = useRef();
-  const { login } = useAuth();
+  const { login, currentUser } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const history = useHistory();
@@ -34,6 +34,12 @@ export default function Login() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (currentUser) {
+      history.push("/");
+    }
+  }, [currentUser]);
   return (
     <div className={classes.authContainer}>
       <Card className={classes.authRoot} variant="outlined">
