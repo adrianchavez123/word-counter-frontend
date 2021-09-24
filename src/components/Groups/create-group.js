@@ -7,6 +7,7 @@ export function handleSubmitGroup(e, state, dispatch, professor_id) {
     name: state.group.name,
     students: state.group.students.map((student) => student.student_id),
     professor_id: professor_id,
+    token: state.group.token,
   };
   if (state.action === "CREATE") {
     fetched = fetch(`${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/groups`, {
@@ -67,16 +68,6 @@ export function handleSubmitGroup(e, state, dispatch, professor_id) {
       dispatch({
         type: groupActions.openGroupModal,
         payload: { openGroup: false },
-      });
-
-      dispatch({
-        type: groupActions.setGroup,
-        payload: {
-          group: {
-            name: "",
-            students: [],
-          },
-        },
       });
     })
     .catch((error) => console.log(error));
@@ -147,13 +138,8 @@ export function handleAddStudent(e, state, dispatch) {
 }
 
 export function handleRemoveStudent(student_id, state, dispatch) {
-  console.log("handleRemoveStudent");
-  console.log(student_id);
-
-  console.log(state);
-  console.log(dispatch);
   dispatch({
     type: groupActions.removeStudent,
-    payload: { student: student_id },
+    payload: { student_id: student_id },
   });
 }

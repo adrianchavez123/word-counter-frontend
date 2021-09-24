@@ -3,12 +3,14 @@ const initialState = {
   group: {
     name: "",
     students: [],
+    token: "",
+    group_id: "",
   },
   student: {
     name: "",
     id: "",
   },
-  action: "CREATE",
+  action: "MODIFY",
   groups: [],
 };
 

@@ -12,14 +12,13 @@ import GroupList from "../GroupList";
 
 export default function GroupForm({
   group,
-  student,
   handleCancel,
   handleSubmit,
-  handleAddStudent,
   handleRemoveStudent,
+  state,
   dispatch,
   editable = true,
-  action = "CREATE",
+  action = "MODIFY",
 }) {
   const classes = useStyles();
   return (
@@ -41,57 +40,24 @@ export default function GroupForm({
       </FormGroup>
 
       <FormGroup className={classes.formGroup}>
+        <InputLabel htmlFor="nombre">Token</InputLabel>
+        <TextField
+          id="token"
+          placeholder="token"
+          value={group.token}
+          disabled
+        />
+      </FormGroup>
+
+      <FormGroup className={classes.formGroup}>
         <GroupList
           group={{ students: group.students }}
           showCloseButton={false}
           removeMembers={true}
+          state={state}
+          dispatch={dispatch}
           handleRemoveStudent={handleRemoveStudent}
         />
-      </FormGroup>
-      <FormGroup className={classes.formGroup}>
-        <div className={classes.addStudent}>
-          <div className={classes.addStudentField}>
-            <InputLabel htmlFor="nombre">Estudiante</InputLabel>
-            <TextField
-              id="estudiante"
-              placeholder="Nombre"
-              value={student.name}
-              onChange={(e) =>
-                dispatch({
-                  type: actions.setStudentName,
-                  payload: { studentName: e.target.value },
-                })
-              }
-              disabled={!editable}
-            />
-          </div>
-          <div className={classes.addStudentField}>
-            <InputLabel htmlFor="nombre">Identificador</InputLabel>
-            <TextField
-              id="identificador"
-              placeholder="Número de identificador"
-              value={student.id}
-              onChange={(e) =>
-                dispatch({
-                  type: actions.setStudentId,
-                  payload: { studentId: e.target.value },
-                })
-              }
-              disabled={!editable}
-            />
-          </div>
-          <Button
-            variant="contained"
-            size="large"
-            className={classes.button}
-            startIcon={<AddCircleIcon />}
-            type="button"
-            onClick={handleAddStudent}
-            style={{ marginRight: "1rem" }}
-          >
-            Agregar
-          </Button>
-        </div>
       </FormGroup>
 
       <div style={{ marginTop: "1rem" }}>
