@@ -73,7 +73,7 @@ export default function ProfileDropDown() {
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>
-          Logout
+          Cerrar sesión
         </MenuItem>
       </Menu>
     </React.Fragment>
