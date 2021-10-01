@@ -48,6 +48,8 @@ export default function Signup() {
         professor_id: professorResponse.professor.professor_id,
         name: "mi grupo",
         token: token,
+        id: null,
+        student_id: null,
       };
       const groupRequest = await fetch(
         `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/groups`,
