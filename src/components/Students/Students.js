@@ -65,7 +65,7 @@ export default function Alumnos() {
   const handleSearchStudentsAssignments = () => {
     const professor_id = currentUser.uid;
     const studentsSelectedIds = state.studentsSelected.map((student) =>
-      Number(student.substring(student.indexOf("(") + 1, student.length - 1))
+      student.substring(student.indexOf("(") + 1, student.length - 1)
     );
     fetch(
       `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/deliver-assignments?professor_id=${professor_id}`,
