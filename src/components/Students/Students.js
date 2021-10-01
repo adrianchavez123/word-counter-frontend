@@ -54,7 +54,7 @@ export default function Alumnos() {
     return [
       deliver.deliver_assignment_id,
       {
-        id: deliver.student.student_id,
+        id: deliver.student.id,
         text: deliver.student.username,
         onClick: () => handleAssignmentDetails(deliver),
       },
@@ -65,7 +65,7 @@ export default function Alumnos() {
   const handleSearchStudentsAssignments = () => {
     const professor_id = currentUser.uid;
     const studentsSelectedIds = state.studentsSelected.map((student) =>
-      student.substring(student.indexOf("(") + 1, student.length - 1)
+      Number(student.substring(student.indexOf("(") + 1, student.length - 1))
     );
     fetch(
       `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/deliver-assignments?professor_id=${professor_id}`,
@@ -100,7 +100,7 @@ export default function Alumnos() {
             });
           }
           const studentsSelectedDelivers = data.filter((deliverAssignment) =>
-            studentsSelectedIds.includes(deliverAssignment.student.student_id)
+            studentsSelectedIds.includes(deliverAssignment.student.id)
           );
           const studentsDelivers =
             studentsSelectedDelivers.map(getStudentsDelivers);
@@ -178,18 +178,18 @@ export default function Alumnos() {
             >
               {state.students.map((student) => (
                 <MenuItem
-                  key={student.student_id}
-                  value={`${student.username} (${student.student_id})`}
+                  key={student.id}
+                  value={`${student.username} (${student.id})`}
                 >
                   <Checkbox
                     checked={
                       state.studentsSelected.indexOf(
-                        `${student.username} (${student.student_id})`
+                        `${student.username} (${student.id})`
                       ) > -1
                     }
                   />
                   <ListItemText
-                    primary={`${student.username} (${student.student_id})`}
+                    primary={`${student.username} (${student.id})`}
                   />
                 </MenuItem>
               ))}
