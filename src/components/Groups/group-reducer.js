@@ -43,9 +43,7 @@ export default function reducer(state, action) {
         group: {
           ...state.group,
           students: [
-            ...state.group.students.filter(
-              (st) => st.student_id !== action.payload.student_id
-            ),
+            ...state.group.students.filter((st) => st.id !== action.payload.id),
           ],
         },
       };

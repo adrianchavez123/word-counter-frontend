@@ -28,24 +28,22 @@ export default function GroupList({
 
       <List style={{ width: "100%", overflow: "auto", maxHeight: 300 }}>
         {group.students
-          .filter((st) => st.student_id !== null)
+          .filter((st) => st.id !== null)
           .map((student) => (
-            <ListItem key={`student-${student.student_id}`}>
+            <ListItem key={`student-${student.id}`}>
               <ListItemAvatar>
                 <Avatar>
                   <PersonIcon />
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText
-                primary={`${student.username}(${student.student_id})`}
-              />
+              <ListItemText primary={`${student.username}(${student.id})`} />
               {removeMembers && (
                 <ListItemSecondaryAction>
                   <IconButton
                     edge="end"
                     aria-label="delete"
                     onClick={() => {
-                      handleRemoveStudent(student.student_id, state, dispatch);
+                      handleRemoveStudent(student.id, state, dispatch);
                     }}
                   >
                     <DeleteIcon />
