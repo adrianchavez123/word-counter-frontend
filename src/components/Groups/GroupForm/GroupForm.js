@@ -43,16 +43,6 @@ export default function GroupForm({
         />
       </FormGroup>
 
-      {/* <FormGroup className={classes.formGroup}>
-        <InputLabel htmlFor="nombre">Token</InputLabel>
-        <TextField
-          id="token"
-          placeholder="token"
-          value={group.token}
-          disabled
-        />
-      </FormGroup> */}
-
       <FormGroup className={classes.formGroup}>
         <GroupList
           group={{ students: group.students }}
