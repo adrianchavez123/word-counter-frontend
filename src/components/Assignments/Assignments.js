@@ -157,6 +157,7 @@ export default function Assignments() {
 
       const exerciseData = await exercisesResponse.json();
       const exercises = exerciseData.map((exercise) => ({
+        ...exercise,
         exercise_id: exercise.exercise_id,
         name: exercise.title,
       }));
