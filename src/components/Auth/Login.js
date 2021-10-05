@@ -44,7 +44,7 @@ export default function Login() {
     <div className={classes.authContainer}>
       <Card className={classes.authRoot} variant="outlined">
         <CardContent>
-          <Title>Inicial Sesión</Title>
+          <Title>Iniciar Sesión</Title>
           {error && <span className={classes.failureText}>{error}</span>}
           <form onSubmit={handleSubmit}>
             <FormGroup className={classes.formGroup}>
