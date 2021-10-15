@@ -42,7 +42,15 @@ export default function GroupForm({
           disabled={!editable}
         />
       </FormGroup>
-
+      <FormGroup className={classes.formGroup}>
+        <InputLabel htmlFor="nombre">Token</InputLabel>
+        <TextField
+          id="token"
+          placeholder="token"
+          value={group.token}
+          disabled
+        />
+      </FormGroup>
       <FormGroup className={classes.formGroup}>
         <GroupList
           group={{ students: group.students }}
@@ -55,7 +63,7 @@ export default function GroupForm({
       </FormGroup>
       <FormGroup className={classes.formGroup}>
         <div className={classes.addStudent}>
-          <div className={classes.addStudentField}>
+          {/* <div className={classes.addStudentField}>
             <InputLabel htmlFor="nombre">Estudiante</InputLabel>
             <TextField
               id="estudiante"
@@ -69,9 +77,9 @@ export default function GroupForm({
               }
               disabled={!editable}
             />
-          </div>
+          </div> */}
 
-          <Button
+          {/* <Button
             variant="contained"
             size="large"
             className={classes.button}
@@ -81,7 +89,7 @@ export default function GroupForm({
             style={{ marginRight: "1rem" }}
           >
             Agregar
-          </Button>
+          </Button> */}
         </div>
         <div style={{ margin: "0.5rem" }}>
           <CSVLink
@@ -99,8 +107,7 @@ export default function GroupForm({
             />
           </CSVLink>
         </div>
-      </FormGroup>
-
+      </FormGroup>{" "}
       <div style={{ marginTop: "1rem" }}>
         <Button
           variant="contained"
