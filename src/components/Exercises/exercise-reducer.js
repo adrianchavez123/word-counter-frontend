@@ -20,6 +20,7 @@ export default function reducer(state, action) {
           description: action.payload.description,
         },
       };
+
     case actions.setWordsAmount:
       return {
         ...state,
@@ -29,10 +30,31 @@ export default function reducer(state, action) {
         },
       };
 
+    case actions.setExerciseImage:
+      return {
+        ...state,
+        exercise: {
+          ...state.exercise,
+          exercise_image: action.payload.exercise_image,
+        },
+      };
+
+    case actions.setImageSrc:
+      return {
+        ...state,
+        imageSrc: action.payload.imageSrc,
+      };
+
     case actions.setExercises:
       return {
         ...state,
         exercises: [...action.payload.exercises],
+      };
+
+    case actions.setAction:
+      return {
+        ...state,
+        action: action.payload.action,
       };
 
     default:

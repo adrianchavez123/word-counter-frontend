@@ -21,7 +21,7 @@ export default function DeliverReview() {
 
   useEffect(() => {
     fetch(
-      `http://localhost:5000/api/deliver-assignments/${deliverAssignmentId}`,
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/deliver-assignments/${deliverAssignmentId}`,
       {
         method: "GET",
         mode: "cors",
@@ -42,31 +42,36 @@ export default function DeliverReview() {
           dispatch({
             type: actions.setDeliver,
             payload: {
-              student: `${results.student.username}(${results.student.student_id})`,
+              student: `${results.student.username}(${results.student.id})`,
               assignment: `${results.exercise.title}`,
               arriveAt: convertISOToYMD(results.arrive_at),
               totalWordsDetected: results.total_words_detected,
               dueDate: convertISOToYMD(results.assignment.due_date),
               exerciseId: results.exercise.exercise_id,
+              audioURL: results.audio_URL,
+              speechToText: results.speech_to_text,
             },
           });
         }
       })
       .catch((error) => console.log(error));
-  }, []);
+  }, [deliverAssignmentId]);
 
   useEffect(() => {
     if (!state.exerciseId) {
       return;
     }
-    fetch(`http://localhost:5000/api/exercises/${state.exerciseId}`, {
-      method: "GET",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    fetch(
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/exercises/${state.exerciseId}`,
+      {
+        method: "GET",
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
       .then((response) => {
         if (response.ok) {
           return response.json();
@@ -80,6 +85,7 @@ export default function DeliverReview() {
             payload: {
               description: results.description,
               totalWordsInTheLecture: results.words_amount,
+              imageURL: results.exercise_image,
             },
           });
         }
@@ -166,8 +172,28 @@ export default function DeliverReview() {
           />
           <div style={{ marginTop: "1rem" }}>
             <Title>Audio</Title>
-            <audio src="./static/music/foo.mp3" controls autoPlay />
+            <audio src={state.audioURL} controls />
           </div>
+          <Title>Texto detectado</Title>
+          <TextareaAutosize
+            minRows={5}
+            aria-label="texto detectado"
+            placeholder="Texto"
+            readOnly
+            value={state.speechToText}
+          />
+          {state.imageURL && (
+            <div style={{ marginTop: "1rem" }}>
+              <Title>Imagen</Title>
+              <div>
+                <img
+                  src={state.imageURL}
+                  alt={state.imageURL}
+                  style={{ maxWidth: "800px" }}
+                />
+              </div>
+            </div>
+          )}
         </Paper>
       </Grid>
     </Grid>

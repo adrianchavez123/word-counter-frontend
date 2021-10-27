@@ -1,14 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useReducer } from "react";
 import clsx from "clsx";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Chart from "../Chart";
-import Deposits from "../Card/";
+import Card from "../Card/";
 import Table from "../../Table";
 import useStyles from "../../Hooks/useStyles/useStyles";
-
+import { homeActions, homeInitialize, homeReducer } from ".";
+import convertISOToYMD from "../../utils/dateUtils";
+import { useAuth } from "../../contexts/AuthContext";
 const headers = [
   "Tarea",
   "Fecha de Entrega Máxima",
@@ -17,11 +19,13 @@ const headers = [
 export default function Home() {
   const classes = useStyles();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+  const [state, dispatch] = useReducer(homeReducer, homeInitialize);
+  const { currentUser } = useAuth();
 
   useEffect(() => {
-    const professor_id = 1;
+    const professor_id = currentUser.uid;
     fetch(
-      `http://localhost:5000/api/deliver-assignments?professor_id=${professor_id}`,
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/deliver-assignments/last-delivers?professor_id=${professor_id}`,
       {
         method: "GET",
         mode: "cors",
@@ -38,22 +42,60 @@ export default function Home() {
       })
       .then((data) => {
         if (data) {
-          console.log(data);
-          // dispatch({
-          //   type: actions.setDeliver,
-          //   payload: {
-          //     student: `${results.student.username}(${results.student.student_id})`,
-          //     assignment: `${results.exercise.title}`,
-          //     arriveAt: convertISOToYMD(results.arrive_at),
-          //     totalWordsDetected: results.total_words_detected,
-          //     dueDate: convertISOToYMD(results.assignment.due_date),
-          //     exerciseId: results.exercise.exercise_id,
-          //   },
-          // });
+          const delivers = data.map((data) => [
+            data.assignment_id,
+            data.title,
+            convertISOToYMD(data.due_date),
+            data.total_delivers,
+          ]);
+
+          dispatch({
+            type: homeActions.getDelivers,
+            payload: {
+              delivers: delivers,
+            },
+          });
         }
       })
       .catch((error) => console.log(error));
-  }, []);
+  }, [currentUser.uid]);
+
+  useEffect(() => {
+    const professor_id = currentUser.uid;
+    fetch(
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/deliver-assignments/average-delivers?professor_id=${professor_id}`,
+      {
+        method: "GET",
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        if (data) {
+          const averageDeliverResults = data.map((data) => ({
+            name: data.title,
+            cantidad_palabras_detectadas: data.avg_words_amount,
+            cantidad_palabras_en_lectura: data.words_amount,
+          }));
+
+          dispatch({
+            type: homeActions.getAverageDeliverResults,
+            payload: {
+              averageDeliverResults: averageDeliverResults,
+            },
+          });
+        }
+      })
+      .catch((error) => console.log(error));
+  }, [currentUser.uid]);
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} md={8} lg={9}>
@@ -63,12 +105,12 @@ export default function Home() {
       </Grid>
       <Grid item xs={12} md={8} lg={9}>
         <Paper className={fixedHeightPaper}>
-          <Chart />
+          <Chart rows={state.averageDeliverResults} />
         </Paper>
       </Grid>
       <Grid item xs={12} md={4} lg={3}>
         <Paper className={fixedHeightPaper}>
-          <Deposits />
+          <Card />
         </Paper>
       </Grid>
 
@@ -78,21 +120,7 @@ export default function Home() {
             title="Ultimas Tareas"
             headers={headers}
             showActions={false}
-            rows={[
-              [1, "Leer lectura el cuento más contado", "2021-08-03", 5],
-              [
-                2,
-                "Leer lectura de la página 189 del libro de lecturas",
-                "2021-08-10",
-                3,
-              ],
-              [
-                2,
-                "Leer lectura de la página 20 del libro de lecturas",
-                "2021-08-15",
-                0,
-              ],
-            ]}
+            rows={state.delivers}
           />
         </Paper>
       </Grid>

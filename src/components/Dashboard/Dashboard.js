@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Switch, Route } from "react-router-dom";
 import clsx from "clsx";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -10,30 +10,91 @@ import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
-import Badge from "@material-ui/core/Badge";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import NotificationsIcon from "@material-ui/icons/Notifications";
 import { mainListItems, secondaryListItems } from "../Nav";
-import Home from "../Home";
+import { Home } from "../Home";
 import Students from "../Students";
 import Exercises from "../Exercises";
-import Assignments from "../Assignments";
+import { Assignments } from "../Assignments";
 import DeliverReview from "../DeliverReview";
 import Footer from "../Footer";
 import useStyles from "../../Hooks/useStyles/useStyles";
+import { useAuth } from "../../contexts/AuthContext";
+import ProfileDropDown from "../ProfileDropDown";
+import tokenGenerator from "../../utils/tokenGenerator";
 
 export default function Dashboard() {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
+  const { currentUser } = useAuth();
+  const uid = currentUser.uid;
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  useEffect(() => {
+    const fetchProfessor = async () => {
+      const professor_id = currentUser.uid;
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/professors/${professor_id}`
+      );
+
+      const json = await response.json();
+      if (json?.message === "Professor not found!") {
+        const professor = {
+          professor_id: currentUser.uid,
+          username: currentUser.displayName,
+          name: currentUser.displayName,
+          email: currentUser.email,
+        };
+        const respose = await fetch(
+          `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/professors`,
+          {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(professor),
+          }
+        );
+        const professorResponse = await respose.json();
+        const token = tokenGenerator();
+        const group = {
+          professor_id: professorResponse.professor.professor_id,
+          name: "mi grupo",
+          token: token,
+          id: null,
+          student_id: null,
+        };
+        const groupRequest = await fetch(
+          `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/groups`,
+          {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(group),
+          }
+        );
+        const groupResponse = await groupRequest.json();
+        if (groupResponse) {
+          return { message: "Professor created successfully" };
+        }
+      }
+    };
+    fetchProfessor();
+  }, [currentUser.uid, currentUser.displayName, currentUser.email]);
 
   return (
     <div className={classes.root}>
@@ -64,11 +125,7 @@ export default function Dashboard() {
           >
             Calificaciones de los estudiantes
           </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
+          <ProfileDropDown />
         </Toolbar>
       </AppBar>
       <Drawer

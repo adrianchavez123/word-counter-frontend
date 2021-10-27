@@ -7,7 +7,6 @@ import useStyles from "../../Hooks/useStyles/useStyles";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
 import ListItemText from "@material-ui/core/ListItemText";
 import Select from "@material-ui/core/Select";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -20,6 +19,7 @@ import Table from "../../Table";
 import studentInitialize from "./student-initialize";
 import studentReducer from "./student-reducer";
 import headers from "./student-headers";
+import { useAuth } from "../../contexts/AuthContext";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -36,6 +36,7 @@ export default function Alumnos() {
   const classes = useStyles();
   const [state, dispatch] = useReducer(studentReducer, studentInitialize);
   let history = useHistory();
+  const { currentUser } = useAuth();
 
   const handleChange = (event) => {
     dispatch({
@@ -53,7 +54,7 @@ export default function Alumnos() {
     return [
       deliver.deliver_assignment_id,
       {
-        id: deliver.student.student_id,
+        id: deliver.student.id,
         text: deliver.student.username,
         onClick: () => handleAssignmentDetails(deliver),
       },
@@ -62,12 +63,12 @@ export default function Alumnos() {
     ];
   };
   const handleSearchStudentsAssignments = () => {
-    const professorId = 1;
+    const professor_id = currentUser.uid;
     const studentsSelectedIds = state.studentsSelected.map((student) =>
       Number(student.substring(student.indexOf("(") + 1, student.length - 1))
     );
     fetch(
-      `http://localhost:5000/api/deliver-assignments?professor_id=${professorId}`,
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/deliver-assignments?professor_id=${professor_id}`,
       {
         method: "GET",
         mode: "cors",
@@ -99,7 +100,7 @@ export default function Alumnos() {
             });
           }
           const studentsSelectedDelivers = data.filter((deliverAssignment) =>
-            studentsSelectedIds.includes(deliverAssignment.student.student_id)
+            studentsSelectedIds.includes(deliverAssignment.student.id)
           );
           const studentsDelivers =
             studentsSelectedDelivers.map(getStudentsDelivers);
@@ -122,15 +123,18 @@ export default function Alumnos() {
   const handleDelete = () => {};
 
   useEffect(() => {
-    const professorId = 1;
-    fetch(`http://localhost:5000/api/students?professor_id=${professorId}`, {
-      method: "GET",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    const professor_id = currentUser.uid;
+    fetch(
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/students?professor_id=${professor_id}`,
+      {
+        method: "GET",
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
       .then((response) => {
         if (response.ok) {
           return response.json();
@@ -147,7 +151,7 @@ export default function Alumnos() {
         }
       })
       .catch((error) => console.log(error));
-  }, []);
+  }, [currentUser.uid]);
   return (
     <Grid container spacing={3}>
       <Breadcrumbs aria-label="breadcrumb">
@@ -174,18 +178,18 @@ export default function Alumnos() {
             >
               {state.students.map((student) => (
                 <MenuItem
-                  key={student.student_id}
-                  value={`${student.username} (${student.student_id})`}
+                  key={student.id}
+                  value={`${student.username} (${student.id})`}
                 >
                   <Checkbox
                     checked={
                       state.studentsSelected.indexOf(
-                        `${student.username} (${student.student_id})`
+                        `${student.username} (${student.id})`
                       ) > -1
                     }
                   />
                   <ListItemText
-                    primary={`${student.username} (${student.student_id})`}
+                    primary={`${student.username} (${student.id})`}
                   />
                 </MenuItem>
               ))}

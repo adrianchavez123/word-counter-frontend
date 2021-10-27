@@ -11,46 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  {
-    name: "Tarea 1",
-    cantidad_palabras_detectadas: 89,
-    cantidad_palabras_en_lectura: 150,
-    amt: 200,
-  },
-  {
-    name: "Tarea 2",
-    cantidad_palabras_detectadas: 95,
-    cantidad_palabras_en_lectura: 160,
-    amt: 200,
-  },
-  {
-    name: "Tarea 3",
-    cantidad_palabras_detectadas: 115,
-    cantidad_palabras_en_lectura: 130,
-    amt: 200,
-  },
-  {
-    name: "Tarea 4",
-    cantidad_palabras_detectadas: 120,
-    cantidad_palabras_en_lectura: 170,
-    amt: 200,
-  },
-  {
-    name: "Tarea 5",
-    cantidad_palabras_detectadas: 135,
-    cantidad_palabras_en_lectura: 160,
-    amt: 200,
-  },
-  {
-    name: "Tarea 6",
-    cantidad_palabras_detectadas: 140,
-    cantidad_palabras_en_lectura: 150,
-    amt: 200,
-  },
-];
-
-export default function Chart() {
+export default function Chart({ rows }) {
   return (
     <React.Fragment>
       <Title>
@@ -61,7 +22,7 @@ export default function Chart() {
         <LineChart
           width={500}
           height={300}
-          data={data}
+          data={rows}
           margin={{
             top: 5,
             right: 30,

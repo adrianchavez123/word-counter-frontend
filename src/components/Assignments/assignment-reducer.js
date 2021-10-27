@@ -53,6 +53,33 @@ export default function reducer(state, action) {
         exercises: [...action.payload.exercises],
       };
 
+    case actions.setGroupSelected:
+      return {
+        ...state,
+        groupSelected: {
+          ...state.groupSelected,
+          ...action.payload.groupSelected,
+        },
+      };
+
+    case actions.openExerciseModal:
+      return { ...state, openExercise: action.payload.openExercise };
+
+    case actions.setExerciseSelected:
+      return {
+        ...state,
+        exerciseSelected: {
+          ...state.exerciseSelected,
+          ...action.payload.exerciseSelected,
+        },
+      };
+
+    case actions.setAction:
+      return {
+        ...state,
+        action: action.payload.action,
+      };
+
     default:
       return state;
   }
