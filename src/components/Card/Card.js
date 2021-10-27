@@ -29,6 +29,15 @@ export default function Card() {
   const { currentUser } = useAuth();
   const professor_id = currentUser.uid;
 
+  const formatGroup = (group) => {
+    const formattedGroup = {
+      name: group.name,
+      group_id: group.group_id,
+      token: group.token,
+      students: [...group.students.filter((g) => g.student_id !== null)],
+    };
+    return formattedGroup;
+  };
   useEffect(() => {
     const loadData = async () => {
       const professor_id = currentUser.uid;
@@ -51,6 +60,13 @@ export default function Card() {
             groups: [...groupsData.groups],
           },
         });
+
+        await dispatch({
+          type: groupActions.setGroup,
+          payload: {
+            group: formatGroup(groupsData.groups[groupsData.groups.length - 1]),
+          },
+        });
       }
 
       const exercisesResponse = await fetch(
@@ -71,7 +87,7 @@ export default function Card() {
         name: exercise.title,
       }));
       await assignmentDispatch({
-        type: assignmentActions.setExercises,
+        type: groupActions.setExercises,
         payload: {
           exercises: [...exercises],
         },
@@ -94,7 +110,10 @@ export default function Card() {
         payload: { assignments: [...asignmentsData] },
       });
     };
-    loadData();
+
+    setTimeout(() => {
+      loadData();
+    }, 2000);
   }, [currentUser.uid]);
 
   return (
@@ -137,12 +156,12 @@ export default function Card() {
             })
           }
         >
-          Crear un nuevo grupo
+          Ver mi grupo
         </Link>
       </div>
       <ModalForm
-        buttonTitle="Crear grupo"
-        title="Crear Grupo"
+        buttonTitle="Ver mi grupo"
+        title="Mi grupo"
         open={state.openGroup}
         showButton={false}
         setOpen={() => {
@@ -164,16 +183,6 @@ export default function Card() {
               type: groupActions.openGroupModal,
               payload: { openGroup: false },
             });
-            dispatch({
-              type: groupActions.setGroup,
-              payload: {
-                group: {
-                  name: "",
-                  students: [],
-                  professor_id: null,
-                },
-              },
-            });
           }}
           handleSubmit={(e) =>
             handleSubmitGroup(e, state, dispatch, professor_id)
@@ -181,6 +190,7 @@ export default function Card() {
           handleAddStudent={(e) => handleAddStudent(e, state, dispatch)}
           handleRemoveStudent={handleRemoveStudent}
           dispatch={dispatch}
+          state={state}
           editable={true}
           action={"CREATE"}
         />

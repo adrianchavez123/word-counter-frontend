@@ -42,7 +42,7 @@ export default function DeliverReview() {
           dispatch({
             type: actions.setDeliver,
             payload: {
-              student: `${results.student.username}(${results.student.student_id})`,
+              student: `${results.student.username}(${results.student.id})`,
               assignment: `${results.exercise.title}`,
               arriveAt: convertISOToYMD(results.arrive_at),
               totalWordsDetected: results.total_words_detected,

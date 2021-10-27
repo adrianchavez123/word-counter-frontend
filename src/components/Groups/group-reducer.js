@@ -38,10 +38,15 @@ export default function reducer(state, action) {
       };
 
     case actions.removeStudent:
-      // remove student
-      console.log("aqui");
-      console.log(state);
-      return state;
+      return {
+        ...state,
+        group: {
+          ...state.group,
+          students: [
+            ...state.group.students.filter((st) => st.id !== action.payload.id),
+          ],
+        },
+      };
 
     case actions.setAction:
       return {

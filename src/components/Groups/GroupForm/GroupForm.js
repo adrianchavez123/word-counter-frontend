@@ -9,17 +9,20 @@ import InputLabel from "@material-ui/core/InputLabel";
 import useStyles from "../../../Hooks/useStyles/useStyles";
 import actions from "../group-actions";
 import GroupList from "../GroupList";
+import { CSVLink } from "react-csv";
+import GetAppIcon from "@material-ui/icons/GetApp";
 
 export default function GroupForm({
   group,
   student,
   handleCancel,
   handleSubmit,
-  handleAddStudent,
   handleRemoveStudent,
+  handleAddStudent,
+  state,
   dispatch,
   editable = true,
-  action = "CREATE",
+  action = "MODIFY",
 }) {
   const classes = useStyles();
   return (
@@ -39,18 +42,28 @@ export default function GroupForm({
           disabled={!editable}
         />
       </FormGroup>
-
+      <FormGroup className={classes.formGroup}>
+        <InputLabel htmlFor="nombre">Token</InputLabel>
+        <TextField
+          id="token"
+          placeholder="token"
+          value={group.token}
+          disabled
+        />
+      </FormGroup>
       <FormGroup className={classes.formGroup}>
         <GroupList
           group={{ students: group.students }}
           showCloseButton={false}
           removeMembers={true}
+          state={state}
+          dispatch={dispatch}
           handleRemoveStudent={handleRemoveStudent}
         />
       </FormGroup>
       <FormGroup className={classes.formGroup}>
         <div className={classes.addStudent}>
-          <div className={classes.addStudentField}>
+          {/* <div className={classes.addStudentField}>
             <InputLabel htmlFor="nombre">Estudiante</InputLabel>
             <TextField
               id="estudiante"
@@ -64,23 +77,9 @@ export default function GroupForm({
               }
               disabled={!editable}
             />
-          </div>
-          <div className={classes.addStudentField}>
-            <InputLabel htmlFor="nombre">Identificador</InputLabel>
-            <TextField
-              id="identificador"
-              placeholder="Número de identificador"
-              value={student.id}
-              onChange={(e) =>
-                dispatch({
-                  type: actions.setStudentId,
-                  payload: { studentId: e.target.value },
-                })
-              }
-              disabled={!editable}
-            />
-          </div>
-          <Button
+          </div> */}
+
+          {/* <Button
             variant="contained"
             size="large"
             className={classes.button}
@@ -90,10 +89,25 @@ export default function GroupForm({
             style={{ marginRight: "1rem" }}
           >
             Agregar
-          </Button>
+          </Button> */}
         </div>
-      </FormGroup>
-
+        <div style={{ margin: "0.5rem" }}>
+          <CSVLink
+            data={[
+              ["numero", "nombre"],
+              ...group.students
+                .filter((st) => st.id != null)
+                .map((student) => [student.id, student.username]),
+            ]}
+            filename={"lista de alumnos.csv"}
+          >
+            Descargar lista
+            <GetAppIcon
+              style={{ fontSize: "1.2rem", position: "relative", top: ".4rem" }}
+            />
+          </CSVLink>
+        </div>
+      </FormGroup>{" "}
       <div style={{ marginTop: "1rem" }}>
         <Button
           variant="contained"
