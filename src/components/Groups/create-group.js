@@ -55,7 +55,7 @@ export async function handleAddStudent(e, state, dispatch) {
   );
   let fetchAction = "POST";
   const data = await response.json();
-
+  console.log(data);
   if (response.status === 200) {
     fetchAction = "PUT";
   }

@@ -21,6 +21,15 @@ export default function reducer(state, action) {
         },
       };
 
+    case actions.setContent:
+      return {
+        ...state,
+        exercise: {
+          ...state.exercise,
+          content: action.payload.content,
+        },
+      };
+
     case actions.setWordsAmount:
       return {
         ...state,
@@ -57,6 +66,156 @@ export default function reducer(state, action) {
         action: action.payload.action,
       };
 
+    case actions.setQuestionName: {
+      const questionIndex = state.exercise.questions.findIndex(
+        (question) => question.questionId === action.payload.questionId
+      );
+
+      if (questionIndex > -1) {
+        const questionsUpdated = [...state.exercise.questions];
+        questionsUpdated[questionIndex].questionName =
+          action.payload.questionName;
+        return {
+          ...state,
+          exercise: {
+            ...state.exercise,
+            questions: [...questionsUpdated],
+          },
+        };
+      }
+      return state;
+    }
+    case actions.addQuestion:
+      const emptyNewQuestion = {
+        questionId: state.exercise.questions.length,
+        questionName: "",
+        options: [
+          { optionName: "", correctAnswer: false },
+          { optionName: "", correctAnswer: false },
+          { optionName: "", correctAnswer: false },
+          { optionName: "", correctAnswer: false },
+        ],
+      };
+      return {
+        ...state,
+        exercise: {
+          ...state.exercise,
+          questions: [...state.exercise.questions, emptyNewQuestion],
+        },
+      };
+
+    case actions.deleteQuestion: {
+      const questionIndex = state.exercise.questions.findIndex(
+        (question) => question.questionId === action.payload.questionId
+      );
+
+      if (questionIndex > -1) {
+        const questionsUpdated = [...state.exercise.questions];
+        questionsUpdated.splice(questionIndex, 1);
+
+        return {
+          ...state,
+          exercise: {
+            ...state.exercise,
+            questions: questionsUpdated,
+          },
+        };
+      }
+      return state;
+    }
+
+    case actions.setOptionName: {
+      const questionIndex = state.exercise.questions.findIndex(
+        (question) => question.questionId === action.payload.questionId
+      );
+
+      if (questionIndex > -1) {
+        const questionsUpdated = [...state.exercise.questions];
+        questionsUpdated[questionIndex].options[
+          action.payload.optionPosition
+        ].optionName = action.payload.optionName;
+        return {
+          ...state,
+          exercise: {
+            ...state.exercise,
+            questions: questionsUpdated,
+          },
+        };
+      }
+      return state;
+    }
+
+    case actions.setCorrectResponse: {
+      const questionIndex = state.exercise.questions.findIndex(
+        (question) => question.questionId === action.payload.questionId
+      );
+
+      if (questionIndex > -1) {
+        const questionsUpdated = [...state.exercise.questions];
+        questionsUpdated[questionIndex].options = questionsUpdated[
+          questionIndex
+        ].options.map((option, i) => {
+          if (i === action.payload.optionPosition) {
+            option.correctAnswer = true;
+          } else {
+            option.correctAnswer = false;
+          }
+          return option;
+        });
+        return {
+          ...state,
+          exercise: {
+            ...state.exercise,
+            questions: questionsUpdated,
+          },
+        };
+      }
+      return state;
+    }
+
+    case actions.deleteOption: {
+      const questionIndex = state.exercise.questions.findIndex(
+        (question) => question.questionId === action.payload.questionId
+      );
+
+      if (questionIndex > -1) {
+        const questionsUpdated = [...state.exercise.questions];
+        questionsUpdated[questionIndex].options.splice(
+          action.payload.optionPosition,
+          1
+        );
+        return {
+          ...state,
+          exercise: {
+            ...state.exercise,
+            questions: questionsUpdated,
+          },
+        };
+      }
+      return state;
+    }
+
+    case actions.addOption: {
+      const questionIndex = state.exercise.questions.findIndex(
+        (question) => question.questionId === action.payload.questionId
+      );
+      if (questionIndex > -1) {
+        const questionsUpdated = [...state.exercise.questions];
+
+        questionsUpdated[questionIndex].options.push({
+          optionName: "",
+          correctAnswer: false,
+        });
+        return {
+          ...state,
+          exercise: {
+            ...state.exercise,
+            questions: questionsUpdated,
+          },
+        };
+      }
+      return state;
+    }
     default:
       return state;
   }

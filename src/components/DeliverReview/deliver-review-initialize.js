@@ -10,6 +10,7 @@ const initialState = {
   audioURL: null,
   imageURL: null,
   speechToText: "",
+  content: "",
 };
 
 export default initialState;

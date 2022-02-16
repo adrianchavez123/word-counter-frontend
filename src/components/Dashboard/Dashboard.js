@@ -30,7 +30,6 @@ export default function Dashboard() {
   const classes = useStyles();
   const [open, setOpen] = useState(true);
   const { currentUser } = useAuth();
-  const uid = currentUser.uid;
 
   const handleDrawerOpen = () => {
     setOpen(true);

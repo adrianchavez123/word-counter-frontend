@@ -86,6 +86,7 @@ export default function DeliverReview() {
               description: results.description,
               totalWordsInTheLecture: results.words_amount,
               imageURL: results.exercise_image,
+              content: results.content,
             },
           });
         }
@@ -180,7 +181,7 @@ export default function DeliverReview() {
             aria-label="texto detectado"
             placeholder="Texto"
             readOnly
-            value={state.speechToText}
+            value={state.speechToText + "\n ----\n" + state.content}
           />
           {state.imageURL && (
             <div style={{ marginTop: "1rem" }}>

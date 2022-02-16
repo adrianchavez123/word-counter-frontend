@@ -62,6 +62,57 @@ export default function Ejercicios() {
       });
     }
   };
+
+  const createQuestions = (data) => {
+    if (state.exercise.questions) {
+      const questionPromises = state.exercise.questions.map((question) => {
+        const questionData = {
+          question_name: question.questionName,
+          exercise_id: data.exercise.exercise_id,
+          options: JSON.stringify(
+            question.options.map((o) => ({
+              option_name: o.optionName,
+              correct: o.correctAnswer,
+            }))
+          ),
+        };
+
+        return fetch(
+          `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/questions`,
+          {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(questionData),
+          }
+        );
+      });
+
+      Promise.all([...questionPromises])
+        .then((response) => {
+          let okay = true;
+          if (response) {
+            response.forEach((r) => {
+              if (!r.ok) {
+                okay = false;
+              }
+            });
+          }
+
+          if (!okay) {
+            console.log("Something went wrong saving the questions.");
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+          return false;
+        });
+    }
+    return true;
+  };
   const handleSubmit = (e, action) => {
     e.preventDefault();
     let fetched = null;
@@ -71,6 +122,7 @@ export default function Ejercicios() {
       words_amount: state.exercise.wordsAmount,
       professor_id: currentUser.uid,
       exercise_image: state.exercise.exercise_image,
+      content: state.exercise.content,
     };
 
     if (action === "CREATE") {
@@ -111,15 +163,21 @@ export default function Ejercicios() {
       })
       .then((data) => {
         if (action === "CREATE") {
-          dispatch({
-            type: actions.setExercises,
-            payload: {
-              exercises: [
-                ...state.exercises,
-                { ...exercise, exercise_id: data.exercise.exercise_id },
-              ],
-            },
-          });
+          if (createQuestions(data)) {
+            dispatch({
+              type: actions.setExercises,
+              payload: {
+                exercises: [
+                  ...state.exercises,
+                  {
+                    ...exercise,
+                    exercise_id: data.exercise.exercise_id,
+                    questions: [...state.exercise.questions],
+                  },
+                ],
+              },
+            });
+          }
         }
         if (action === "MODIFY") {
           const exercises = state.exercises.filter(
@@ -149,6 +207,18 @@ export default function Ejercicios() {
               wordsAmount: 0,
               exercise_id: null,
               exercise_image: "",
+              questions: [
+                {
+                  questionId: 0,
+                  questionName: "",
+                  options: [
+                    { optionName: "", correctAnswer: false },
+                    { optionName: "", correctAnswer: false },
+                    { optionName: "", correctAnswer: false },
+                    { optionName: "", correctAnswer: false },
+                  ],
+                },
+              ],
             },
           },
         });
@@ -165,6 +235,64 @@ export default function Ejercicios() {
         exercise.words_amount,
       ];
     });
+  };
+
+  const includeQuestionsToTheExercises = async (exercises) => {
+    const exercisePromises = exercises.map((exercise) => {
+      const professor_id = currentUser.uid;
+      const id = exercise.exercise_id;
+      return fetch(
+        `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/questions?exercise_id=${id}&professor_id=${professor_id}`,
+        {
+          method: "GET",
+          mode: "cors",
+          cache: "no-cache",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    });
+
+    const questions = await Promise.all([...exercisePromises]);
+    const newExercises = [];
+    for await (const question of questions) {
+      const exerciseQuestions = await question.json();
+      if (question.ok) {
+        const exerciseIndex = exercises.findIndex(
+          (exercise) => exercise.exercise_id === exerciseQuestions.exercise.id
+        );
+
+        if (exerciseIndex > -1) {
+          const questions = exerciseQuestions.questions.map((q) => ({
+            questionId: q.question_id,
+            questionName: q.question_name,
+            options: q.options.map((o) => ({
+              optionName: o.option_name,
+              correctAnswer: o.correct,
+            })),
+          }));
+          newExercises.push({
+            ...exercises[exerciseIndex],
+            questions: questions,
+          });
+        }
+      } else {
+        const url = new URL(question.url);
+        const exercise_id = +url.searchParams.get("exercise_id");
+        const exerciseIndex = exercises.findIndex(
+          (exercise) => exercise.exercise_id === exercise_id
+        );
+
+        if (exerciseIndex > -1) {
+          newExercises.push({
+            ...exercises[exerciseIndex],
+            questions: [],
+          });
+        }
+      }
+    }
+    return newExercises;
   };
   useEffect(() => {
     const professor_id = currentUser.uid;
@@ -185,15 +313,19 @@ export default function Ejercicios() {
         }
       })
       .then((data) => {
-        dispatch({
-          type: actions.setExercises,
-          payload: {
-            exercises: [...data],
-          },
+        const promises = includeQuestionsToTheExercises(data);
+        promises.then((updatedData) => {
+          dispatch({
+            type: actions.setExercises,
+            payload: {
+              exercises: updatedData,
+            },
+          });
         });
       })
       .catch((error) => console.log(error));
   }, [currentUser.uid]);
+
   return (
     <Grid container spacing={3}>
       <Breadcrumbs aria-label="breadcrumb">
@@ -232,6 +364,7 @@ export default function Ejercicios() {
                       title: "",
                       description: "",
                       wordsAmount: 0,
+                      content: "",
                     },
                   },
                 });
