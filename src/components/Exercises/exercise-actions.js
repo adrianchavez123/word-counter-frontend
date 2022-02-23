@@ -16,6 +16,8 @@ const actions = {
   setCorrectResponse: "SET_CORRECT_RESPONSE",
   deleteOption: "DELETE_OPTION",
   addOption: "ADD_OPTION",
+  setQuestionId: "SET_QUESTION_ID",
+  clearModal: "CLEAR_MODAL",
 };
 
 export default actions;

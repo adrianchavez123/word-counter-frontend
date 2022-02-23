@@ -63,12 +63,25 @@ export default function Ejercicios() {
     }
   };
 
-  const createQuestions = (data) => {
+  const closeModal = () => {
+    dispatch({
+      type: actions.openExerciseModal,
+      payload: { openExercise: false },
+    });
+  };
+
+  const submitQuestions = async (data, action) => {
+    let questionsWithId = [];
+    let okay = true;
     if (state.exercise.questions) {
-      const questionPromises = state.exercise.questions.map((question) => {
+      const questionsData = state.exercise.questions.map((question) => {
         const questionData = {
           question_name: question.questionName,
-          exercise_id: data.exercise.exercise_id,
+          exercise_id:
+            action === "MODIFY"
+              ? state.exercise.exercise_id
+              : data.exercise.exercise_id,
+          question_id: question.questionId,
           options: JSON.stringify(
             question.options.map((o) => ({
               option_name: o.optionName,
@@ -76,11 +89,20 @@ export default function Ejercicios() {
             }))
           ),
         };
+        return questionData;
+      });
+      const questionPromises = questionsData.map((questionData) => {
+        let apiEndpoint = "api/questions";
+        let method = "POST";
+        if (action === "MODIFY") {
+          apiEndpoint = `api/questions/${questionData.question_id}`;
+          method = "PUT";
+        }
 
         return fetch(
-          `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/questions`,
+          `${process.env.REACT_APP_BACKEND_SERVICE_URL}/${apiEndpoint}`,
           {
-            method: "POST",
+            method: method,
             mode: "cors",
             cache: "no-cache",
             headers: {
@@ -91,31 +113,96 @@ export default function Ejercicios() {
         );
       });
 
-      Promise.all([...questionPromises])
-        .then((response) => {
-          let okay = true;
-          if (response) {
-            response.forEach((r) => {
-              if (!r.ok) {
-                okay = false;
-              }
-            });
-          }
+      const response = await Promise.all([...questionPromises]);
 
-          if (!okay) {
-            console.log("Something went wrong saving the questions.");
+      for await (const r of response) {
+        if (!r.ok) {
+          if (action === "MODIFY") {
+            //new question at modification
+            const urlParts = r.url.split("/");
+            const endPointId = +urlParts[urlParts.length - 1];
+
+            const newQuestion = questionsData.find(
+              (q) => q.question_id === endPointId
+            );
+            if (newQuestion) {
+              const apiEndpoint = "api/questions";
+              const fetched2 = await fetch(
+                `${process.env.REACT_APP_BACKEND_SERVICE_URL}/${apiEndpoint}`,
+                {
+                  method: "POST",
+                  mode: "cors",
+                  cache: "no-cache",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(newQuestion),
+                }
+              );
+
+              const question = await setQuestionId(fetched2);
+              questionsWithId.push(question);
+            }
+          } else {
+            okay = false;
           }
-        })
-        .catch((e) => {
-          console.log(e);
-          return false;
-        });
+        } else {
+          if (action === "CREATE") {
+            const question = await setQuestionId(r);
+            questionsWithId.push(question);
+          }
+        }
+      }
+
+      if (!okay) {
+        console.log("Something went wrong saving the questions.");
+        return false;
+      }
+      return questionsWithId;
     }
-    return true;
+    return false;
   };
+
+  const setQuestionId = async (promise) => {
+    const question = await promise.json();
+    return await new Promise((resolve, refeject) => {
+      dispatch({
+        type: actions.setQuestionId,
+        payload: { question: question.question },
+      });
+      resolve(question.question);
+    });
+  };
+
+  const handleRemoveQuestion = async (e, questionId) => {
+    e.preventDefault();
+    const apiEndpoint = "api/questions";
+    const response = await fetch(
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/${apiEndpoint}/${questionId}`,
+      {
+        method: "DELETE",
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const deleteResponse = await response.json();
+    console.log(deleteResponse.message);
+
+    dispatch({
+      type: actions.deleteQuestion,
+      payload: {
+        questionId: questionId,
+      },
+    });
+  };
+
   const handleSubmit = (e, action) => {
     e.preventDefault();
     let fetched = null;
+
     const exercise = {
       title: state.exercise.title,
       description: state.exercise.description,
@@ -161,25 +248,52 @@ export default function Ejercicios() {
           return response.json();
         }
       })
-      .then((data) => {
-        if (action === "CREATE") {
-          if (createQuestions(data)) {
-            dispatch({
-              type: actions.setExercises,
-              payload: {
-                exercises: [
-                  ...state.exercises,
-                  {
-                    ...exercise,
-                    exercise_id: data.exercise.exercise_id,
-                    questions: [...state.exercise.questions],
-                  },
-                ],
-              },
-            });
-          }
+      .then(async (data) => {
+        const questionsSaved = await submitQuestions(data, action);
+        let questions = [];
+        if (questionsSaved) {
+          questions = questionsSaved.map((question) => ({
+            questionId: question.question_id,
+            questionName: question.question_name,
+            options: question.options.map((option) => ({
+              optionName: option.option_name,
+              correctAnswer: option.correct,
+            })),
+          }));
         }
-        if (action === "MODIFY") {
+        return { questionsSaved: questions, data: data };
+      })
+      .then(async ({ questionsSaved, data }) => {
+        const emptyQuestions = [
+          {
+            questionId: 0,
+            questionName: "",
+            options: [
+              { optionName: "", correctAnswer: false },
+              { optionName: "", correctAnswer: false },
+              { optionName: "", correctAnswer: false },
+              { optionName: "", correctAnswer: false },
+            ],
+          },
+        ];
+
+        if (action === "CREATE") {
+          dispatch({
+            type: actions.setExercises,
+            payload: {
+              exercises: [
+                ...state.exercises,
+                {
+                  ...exercise,
+                  exercise_id: data.exercise.exercise_id,
+                  questions: questionsSaved
+                    ? [...questionsSaved]
+                    : emptyQuestions,
+                },
+              ],
+            },
+          });
+        } else if (action === "MODIFY") {
           const exercises = state.exercises.filter(
             (exercise) => exercise.exercise_id !== state.exercise.exercise_id
           );
@@ -188,40 +302,18 @@ export default function Ejercicios() {
             payload: {
               exercises: [
                 ...exercises,
-                { ...exercise, exercise_id: state.exercise.exercise_id },
+                {
+                  ...exercise,
+                  exercise_id: state.exercise.exercise_id,
+                  questions: questionsSaved
+                    ? [...state.exercise.questions]
+                    : emptyQuestions,
+                },
               ],
             },
           });
         }
-        dispatch({
-          type: actions.openExerciseModal,
-          payload: { openExercise: false },
-        });
-
-        dispatch({
-          type: actions.setExercise,
-          payload: {
-            exercise: {
-              title: "",
-              description: "",
-              wordsAmount: 0,
-              exercise_id: null,
-              exercise_image: "",
-              questions: [
-                {
-                  questionId: 0,
-                  questionName: "",
-                  options: [
-                    { optionName: "", correctAnswer: false },
-                    { optionName: "", correctAnswer: false },
-                    { optionName: "", correctAnswer: false },
-                    { optionName: "", correctAnswer: false },
-                  ],
-                },
-              ],
-            },
-          },
-        });
+        closeModal();
       })
       .catch((error) => console.log(error));
   };
@@ -295,6 +387,7 @@ export default function Ejercicios() {
     return newExercises;
   };
   useEffect(() => {
+    let mounted = true;
     const professor_id = currentUser.uid;
     fetch(
       `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/exercises?professor_id=${professor_id}`,
@@ -315,15 +408,21 @@ export default function Ejercicios() {
       .then((data) => {
         const promises = includeQuestionsToTheExercises(data);
         promises.then((updatedData) => {
-          dispatch({
-            type: actions.setExercises,
-            payload: {
-              exercises: updatedData,
-            },
-          });
+          if (mounted) {
+            dispatch({
+              type: actions.setExercises,
+              payload: {
+                exercises: updatedData,
+              },
+            });
+          }
         });
       })
       .catch((error) => console.log(error));
+
+    return () => {
+      mounted = false;
+    };
   }, [currentUser.uid]);
 
   return (
@@ -341,12 +440,12 @@ export default function Ejercicios() {
             open={state.openExercise}
             setOpen={() => {
               dispatch({
-                type: actions.openExerciseModal,
-                payload: { openExercise: !state.openExercise },
+                type: actions.clearModal,
+                payload: {},
               });
               dispatch({
-                type: actions.setAction,
-                payload: { action: "CREATE" },
+                type: actions.openExerciseModal,
+                payload: { openExercise: !state.openExercise },
               });
             }}
           >
@@ -373,6 +472,7 @@ export default function Ejercicios() {
               dispatch={dispatch}
               editable={true}
               action={state.action}
+              handleRemoveQuestion={handleRemoveQuestion}
             />
           </ModalForm>
         </Paper>

@@ -20,6 +20,7 @@ export default function DeliverReview() {
   const classes = useStyles();
 
   useEffect(() => {
+    let mounted = true;
     fetch(
       `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/deliver-assignments/${deliverAssignmentId}`,
       {
@@ -39,22 +40,28 @@ export default function DeliverReview() {
       .then((data) => {
         if (data) {
           const results = data[0];
-          dispatch({
-            type: actions.setDeliver,
-            payload: {
-              student: `${results.student.username}(${results.student.id})`,
-              assignment: `${results.exercise.title}`,
-              arriveAt: convertISOToYMD(results.arrive_at),
-              totalWordsDetected: results.total_words_detected,
-              dueDate: convertISOToYMD(results.assignment.due_date),
-              exerciseId: results.exercise.exercise_id,
-              audioURL: results.audio_URL,
-              speechToText: results.speech_to_text,
-            },
-          });
+          if (mounted) {
+            dispatch({
+              type: actions.setDeliver,
+              payload: {
+                student: `${results.student.username}(${results.student.id})`,
+                assignment: `${results.exercise.title}`,
+                arriveAt: convertISOToYMD(results.arrive_at),
+                totalWordsDetected: results.total_words_detected,
+                dueDate: convertISOToYMD(results.assignment.due_date),
+                exerciseId: results.exercise.exercise_id,
+                audioURL: results.audio_URL,
+                speechToText: results.speech_to_text,
+              },
+            });
+          }
         }
       })
       .catch((error) => console.log(error));
+
+    return () => {
+      mounted = false;
+    };
   }, [deliverAssignmentId]);
 
   useEffect(() => {

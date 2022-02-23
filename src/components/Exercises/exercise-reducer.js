@@ -85,6 +85,29 @@ export default function reducer(state, action) {
       }
       return state;
     }
+
+    case actions.setQuestionId: {
+      const questionIndex = state.exercise.questions.findIndex(
+        (question) =>
+          question?.questionName === action.payload.question.question_name
+      );
+
+      if (questionIndex > -1) {
+        let questionsUpdated = [...state.exercise.questions];
+        questionsUpdated[questionIndex] = {
+          ...questionsUpdated[questionIndex],
+          questionId: action.payload.question.question_id,
+        };
+        return {
+          ...state,
+          exercise: {
+            ...state.exercise,
+            questions: questionsUpdated,
+          },
+        };
+      }
+      return state;
+    }
     case actions.addQuestion:
       const emptyNewQuestion = {
         questionId: state.exercise.questions.length,
@@ -216,6 +239,32 @@ export default function reducer(state, action) {
       }
       return state;
     }
+
+    case actions.clearModal:
+      return {
+        ...state,
+        exercise: {
+          title: "",
+          description: "",
+          wordsAmount: 0,
+          exercise_id: null,
+          exercise_image: "",
+          content: "",
+          questions: [
+            {
+              questionId: 0,
+              questionName: "",
+              options: [
+                { optionName: "", correctAnswer: false },
+                { optionName: "", correctAnswer: false },
+                { optionName: "", correctAnswer: false },
+                { optionName: "", correctAnswer: false },
+              ],
+            },
+          ],
+        },
+        imageSrc: "",
+      };
     default:
       return state;
   }

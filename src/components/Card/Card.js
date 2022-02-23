@@ -39,6 +39,7 @@ export default function Card() {
     return formattedGroup;
   };
   useEffect(() => {
+    let mounted = true;
     const loadData = async () => {
       const professor_id = currentUser.uid;
       const groupsResponse = await fetch(
@@ -54,19 +55,23 @@ export default function Card() {
       );
       const groupsData = await groupsResponse.json();
       if (groupsData?.groups) {
-        await assignmentDispatch({
-          type: assignmentActions.setGroups,
-          payload: {
-            groups: [...groupsData.groups],
-          },
-        });
+        if (mounted) {
+          await assignmentDispatch({
+            type: assignmentActions.setGroups,
+            payload: {
+              groups: [...groupsData.groups],
+            },
+          });
 
-        await dispatch({
-          type: groupActions.setGroup,
-          payload: {
-            group: formatGroup(groupsData.groups[groupsData.groups.length - 1]),
-          },
-        });
+          await dispatch({
+            type: groupActions.setGroup,
+            payload: {
+              group: formatGroup(
+                groupsData.groups[groupsData.groups.length - 1]
+              ),
+            },
+          });
+        }
       }
 
       const exercisesResponse = await fetch(
@@ -86,12 +91,14 @@ export default function Card() {
         exercise_id: exercise.exercise_id,
         name: exercise.title,
       }));
-      await assignmentDispatch({
-        type: groupActions.setExercises,
-        payload: {
-          exercises: [...exercises],
-        },
-      });
+      if (mounted) {
+        await assignmentDispatch({
+          type: groupActions.setExercises,
+          payload: {
+            exercises: [...exercises],
+          },
+        });
+      }
 
       const assignmentsResponse = await fetch(
         `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/assignments?professor_id=${professor_id}`,
@@ -105,15 +112,21 @@ export default function Card() {
         }
       );
       const asignmentsData = await assignmentsResponse.json();
-      await assignmentDispatch({
-        type: assignmentActions.setAssignments,
-        payload: { assignments: [...asignmentsData] },
-      });
+      if (mounted) {
+        await assignmentDispatch({
+          type: assignmentActions.setAssignments,
+          payload: { assignments: [...asignmentsData] },
+        });
+      }
     };
 
     setTimeout(() => {
       loadData();
     }, 2000);
+
+    return () => {
+      mounted = false;
+    };
   }, [currentUser.uid]);
 
   return (

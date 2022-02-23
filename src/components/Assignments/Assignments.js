@@ -120,6 +120,7 @@ export default function Assignments() {
   };
 
   useEffect(() => {
+    let mounted = true;
     const loadData = async () => {
       const professor_id = currentUser.uid;
       const groupsResponse = await fetch(
@@ -135,12 +136,14 @@ export default function Assignments() {
       );
       const groupsData = await groupsResponse.json();
       if (groupsData?.groups) {
-        await dispatch({
-          type: actions.setGroups,
-          payload: {
-            groups: [...groupsData.groups],
-          },
-        });
+        if (mounted) {
+          await dispatch({
+            type: actions.setGroups,
+            payload: {
+              groups: [...groupsData.groups],
+            },
+          });
+        }
       }
 
       const exercisesResponse = await fetch(
@@ -161,12 +164,14 @@ export default function Assignments() {
         exercise_id: exercise.exercise_id,
         name: exercise.title,
       }));
-      await dispatch({
-        type: actions.setExercises,
-        payload: {
-          exercises: [...exercises],
-        },
-      });
+      if (mounted) {
+        await dispatch({
+          type: actions.setExercises,
+          payload: {
+            exercises: [...exercises],
+          },
+        });
+      }
 
       const assignmentsResponse = await fetch(
         `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/assignments?professor_id=${professor_id}`,
@@ -180,12 +185,18 @@ export default function Assignments() {
         }
       );
       const asignmentsData = await assignmentsResponse.json();
-      await dispatch({
-        type: actions.setAssignments,
-        payload: { assignments: [...asignmentsData] },
-      });
+      if (mounted) {
+        await dispatch({
+          type: actions.setAssignments,
+          payload: { assignments: [...asignmentsData] },
+        });
+      }
     };
     loadData();
+
+    return () => {
+      mounted = false;
+    };
   }, [currentUser.uid]);
 
   const flatAssignments = () => {

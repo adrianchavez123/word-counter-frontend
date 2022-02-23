@@ -23,6 +23,7 @@ export default function Home() {
   const { currentUser } = useAuth();
 
   useEffect(() => {
+    let mounted = true;
     const professor_id = currentUser.uid;
     fetch(
       `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/deliver-assignments/last-delivers?professor_id=${professor_id}`,
@@ -49,18 +50,25 @@ export default function Home() {
             data.total_delivers,
           ]);
 
-          dispatch({
-            type: homeActions.getDelivers,
-            payload: {
-              delivers: delivers,
-            },
-          });
+          if (mounted) {
+            dispatch({
+              type: homeActions.getDelivers,
+              payload: {
+                delivers: delivers,
+              },
+            });
+          }
         }
       })
       .catch((error) => console.log(error));
+
+    return () => {
+      mounted = false;
+    };
   }, [currentUser.uid]);
 
   useEffect(() => {
+    let mounted = true;
     const professor_id = currentUser.uid;
     fetch(
       `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/deliver-assignments/average-delivers?professor_id=${professor_id}`,
@@ -86,15 +94,21 @@ export default function Home() {
             cantidad_palabras_en_lectura: data.words_amount,
           }));
 
-          dispatch({
-            type: homeActions.getAverageDeliverResults,
-            payload: {
-              averageDeliverResults: averageDeliverResults,
-            },
-          });
+          if (mounted) {
+            dispatch({
+              type: homeActions.getAverageDeliverResults,
+              payload: {
+                averageDeliverResults: averageDeliverResults,
+              },
+            });
+          }
         }
       })
       .catch((error) => console.log(error));
+
+    return () => {
+      mounted = false;
+    };
   }, [currentUser.uid]);
   return (
     <Grid container spacing={3}>

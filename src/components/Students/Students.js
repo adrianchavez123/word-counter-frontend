@@ -123,6 +123,7 @@ export default function Alumnos() {
   const handleDelete = () => {};
 
   useEffect(() => {
+    let mounted = true;
     const professor_id = currentUser.uid;
     fetch(
       `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/students?professor_id=${professor_id}`,
@@ -141,7 +142,7 @@ export default function Alumnos() {
         }
       })
       .then((data) => {
-        if (data) {
+        if (data && mounted) {
           dispatch({
             type: actions.setStudents,
             payload: {
@@ -151,6 +152,10 @@ export default function Alumnos() {
         }
       })
       .catch((error) => console.log(error));
+
+    return () => {
+      mounted = false;
+    };
   }, [currentUser.uid]);
   return (
     <Grid container spacing={3}>

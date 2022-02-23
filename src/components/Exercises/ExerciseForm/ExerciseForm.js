@@ -17,6 +17,7 @@ export default function ExerciseForm({
   exercise,
   handleCancel,
   handleSubmit,
+  handleRemoveQuestion,
   dispatch,
   editable = true,
   action = "CREATE",
@@ -93,10 +94,15 @@ export default function ExerciseForm({
               payload: { content: text },
             });
 
+            const wordsArray = text.replace(/\n/g, "").split(/(\s+)/).length;
+            let wordsAmount = 1;
+            if (wordsArray > 1) {
+              wordsAmount = wordsArray / 2;
+            }
             dispatch({
               type: actions.setWordsAmount,
               payload: {
-                wordsAmount: text.replace(/\n/g, "").split(/(\s+)/).length,
+                wordsAmount: Math.round(wordsAmount),
               },
             });
           }}
@@ -188,12 +194,7 @@ export default function ExerciseForm({
                   </div>
                   <ClearIcon
                     onClick={(e) =>
-                      dispatch({
-                        type: actions.deleteQuestion,
-                        payload: {
-                          questionId: question.questionId,
-                        },
-                      })
+                      handleRemoveQuestion(e, question.questionId)
                     }
                   />
                 </div>
@@ -237,7 +238,7 @@ export default function ExerciseForm({
                         <label htmlFor="">Resp. correcta</label>
 
                         <Radio
-                          checked={option.correctAnswer}
+                          checked={!!option.correctAnswer}
                           onChange={(e) =>
                             dispatch({
                               type: actions.setCorrectResponse,
