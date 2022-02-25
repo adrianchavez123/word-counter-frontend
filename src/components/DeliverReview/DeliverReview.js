@@ -3,8 +3,11 @@ import { useParams, Link } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
+import Radio from "@material-ui/core/Radio";
 import InputLabel from "@material-ui/core/InputLabel";
 import TextareaAutosize from "@material-ui/core/TextareaAutosize";
+import CheckIcon from "@material-ui/icons/Check";
+import ClearIcon from "@material-ui/icons/Clear";
 import Title from "../Title";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
@@ -101,6 +104,55 @@ export default function DeliverReview() {
       .catch((error) => console.log(error));
   }, [state.exerciseId]);
 
+  useEffect(() => {
+    let mounted = true;
+
+    fetch(
+      `${process.env.REACT_APP_BACKEND_SERVICE_URL}/api/deliver-assignment-answers?deliver_assignment_id=${deliverAssignmentId}`,
+      {
+        method: "GET",
+        mode: "cors",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        if (mounted) {
+          if (data?.questions) {
+            const formattedQuestions = data.questions.map((question) => ({
+              questionId: question.question_id,
+              questionName: question.question_name,
+              correct: question.optionSelected.correct,
+              options: question.options.map((option) => ({
+                optionId: option.option_id,
+                optionName: option.option_name,
+                answerSelected:
+                  option.option_id ===
+                  question.optionSelected.question_option_id,
+              })),
+            }));
+            dispatch({
+              type: actions.setExerciseDetails,
+              payload: {
+                questions: [...formattedQuestions],
+              },
+            });
+          }
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [deliverAssignmentId]);
+
   return (
     <Grid container spacing={3}>
       <Breadcrumbs aria-label="breadcrumb">
@@ -190,6 +242,57 @@ export default function DeliverReview() {
             readOnly
             value={state.speechToText + "\n ----\n" + state.content}
           />
+          {state.questions && (
+            <div style={{ marginTop: "1rem" }}>
+              <Title>Cuestionario</Title>
+              {state.questions.map((question, i) => (
+                <div key={question.questionId}>
+                  <p
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    {question.correct ? (
+                      <CheckIcon
+                        style={{ fontSize: "2rem", color: "#2e7d32" }}
+                      />
+                    ) : (
+                      <ClearIcon
+                        style={{ fontSize: "2rem", color: "#d32f2f" }}
+                      />
+                    )}
+                    {i + 1}
+                    {") "}
+                    {question.questionName}
+                  </p>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "0.5rem 4rem",
+                    }}
+                  >
+                    {question.options.map((option) => (
+                      <>
+                        <label htmlFor="">{option.optionName}</label>
+                        <Radio
+                          checked={!!option.answerSelected}
+                          disabled
+                          value={option.optionName}
+                          name={`radio-buttons-${question.questionId}`}
+                          inputProps={{ "aria-label": option.optionName }}
+                        />
+                      </>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {state.imageURL && (
             <div style={{ marginTop: "1rem" }}>
               <Title>Imagen</Title>

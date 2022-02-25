@@ -11,6 +11,7 @@ const initialState = {
   imageURL: null,
   speechToText: "",
   content: "",
+  questions: [],
 };
 
 export default initialState;

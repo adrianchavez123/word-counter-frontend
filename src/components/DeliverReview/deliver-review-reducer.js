@@ -11,7 +11,11 @@ export default function reducer(state, action) {
         ...state,
         ...action.payload,
       };
-
+    case actions.setQuizz:
+      return {
+        ...state,
+        questions: [...action.payload.questions],
+      };
     default:
       return state;
   }

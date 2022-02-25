@@ -68,7 +68,7 @@ export default function ExerciseForm({
         <InputLabel htmlFor="descripcion">Descripción</InputLabel>
         <TextareaAutosize
           aria-label="Descripción"
-          minRows={10}
+          minRows={3}
           placeholder="Ingresa una descripción"
           value={exercise.description}
           onChange={(e) =>
@@ -234,6 +234,7 @@ export default function ExerciseForm({
                             })
                           }
                           disabled={!editable}
+                          inputProps={{ maxLength: 50 }}
                         />
                         <label htmlFor="">Resp. correcta</label>
 
